@@ -1,0 +1,5 @@
+<#list tweets as tweet>
+    <#if (tweet.quotedTweet)??>
+        ${tweet.quotedTweet.user.screenName}
+    </#if>
+</#list>   

@@ -1,0 +1,5 @@
+<#list tweets as tweet>
+    <#list tweet.youTubeVideos as youTubeVidId>
+        ${youTubeVidId} 
+    </#list>
+</#list>

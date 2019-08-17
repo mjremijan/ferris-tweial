@@ -1,0 +1,5 @@
+<#list tweets as tweet>
+    <#if !tweet.retweet>
+        FALSE
+    </#if>
+</#list> 

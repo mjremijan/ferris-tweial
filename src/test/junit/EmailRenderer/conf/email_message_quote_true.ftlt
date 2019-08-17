@@ -1,0 +1,5 @@
+<#list tweets as tweet>
+    <#if (tweet.quotedTweet)??>
+        TRUE
+    </#if>
+</#list>   

@@ -1,0 +1,3 @@
+<#list tweets as tweet>
+    ${tweet.user.screenName}
+</#list> 

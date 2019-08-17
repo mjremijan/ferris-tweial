@@ -1,0 +1,5 @@
+<#list tweets as tweet>
+    <#if tweet.retweet>
+        ${tweet.retweeterName}
+    </#if>
+</#list>   
