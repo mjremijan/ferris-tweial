@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>PreferencesHandler.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.preferences</a> &gt; <span class="el_source">PreferencesHandler.java</span></div><h1>PreferencesHandler.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.preferences;
+
+import java.util.Collections;
+import java.util.List;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.lang.IntegerTool;
+import org.ferris.tweial.console.lang.LongTool;
+import org.ferris.tweial.console.twitter.TweetRetrievalEvent;
+import org.ferris.tweial.console.twitter.TweetRetrievalPriority;
+import org.ferris.tweial.console.util.PropertiesFile;
+import org.jboss.weld.experimental.Priority;
+import twitter4j.Status;
+
+/**
+ * This class is responsible for handling {@link Preferences} objects
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+@Singleton
+<span class="nc" id="L23">public class PreferencesHandler {</span>
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected PreferencesPropertiesFile file;
+
+    /**
+     * Return the user's {@link Preferences}.  If for some reason
+     * the preferences cannot be returned, a {@link Preferences}
+     * object with hard-coded default values is returned.
+     *
+     * @return {@link Preferences} object. Never null.
+     */
+    public Preferences findPreferences() {
+<span class="nc" id="L38">        PropertiesFile props</span>
+            = new PropertiesFile(file);
+
+<span class="nc" id="L41">        Preferences prefs</span>
+            = new Preferences();
+
+        // sendOnlyIfTweetsGreaterThan
+<span class="nc" id="L45">        prefs.setSendOnlyIfTweetsGreaterThan(</span>
+<span class="nc" id="L46">            IntegerTool.parseInt(props.find(&quot;sendOnlyIfTweetsGreaterThan&quot;, null), 0)</span>
+        );
+
+        // getOnlyThisTweetId
+<span class="nc" id="L50">        prefs.setGetOnlyThisTweetId(</span>
+<span class="nc" id="L51">            LongTool.parseLong(props.find(&quot;getOnlyThisTweetId&quot;, null), -1)</span>
+        );
+
+        // noImageUrl
+<span class="nc" id="L55">        prefs.setNoImageUrl(</span>
+<span class="nc" id="L56">            props.find(&quot;noImageUrl&quot;, &quot;https://icon-library.net/images/no-image-available-icon/no-image-available-icon-6.jpg&quot;)</span>
+        );
+
+<span class="nc" id="L59">        return prefs;</span>
+    }
+
+
+    /**
+     * Check if the the number of new tweets found in this run is greater
+     * than the minimum number needed to send the email.  If not, short circut
+     * the rest of the processes by setting the number of new tweets found
+     * in this run to be 0.
+     *
+     * {@link TweetRetrievalEvent} parameter
+     *
+     * @param event No validation performed on this parameter.
+     */
+    protected void checkIfThereAreEnoughNewTweets(
+        @Observes @Priority(TweetRetrievalPriority.CHECK_NEW_TWEETS_FROM_THIS_RUN_AGAINST_PREFERENCES) TweetRetrievalEvent event) {
+<span class="nc" id="L75">        log.info(&quot;Check new tweets from this run against preferences&quot;);</span>
+
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (findPreferences().getGetOnlyThisTweetId() == -1)</span>
+        {
+<span class="nc" id="L79">            List&lt;Status&gt; newTweetsFromThisRun</span>
+<span class="nc" id="L80">                = event.getNewTweetsFromThisRun();</span>
+
+<span class="nc" id="L82">            Integer i = findPreferences().getSendOnlyIfTweetsGreaterThan();</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">            if (newTweetsFromThisRun.size() &lt;= i) {</span>
+<span class="nc" id="L84">                log.info(String.format(</span>
+                    &quot;Number of new tweets in this run %d is not greater then preference %d&quot;
+<span class="nc" id="L86">                    , newTweetsFromThisRun.size()</span>
+<span class="nc" id="L87">                    , i.intValue()));</span>
+<span class="nc" id="L88">                event.setNewTweetsFromThisRun(Collections.emptyList());</span>
+            }
+        }
+<span class="nc" id="L91">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

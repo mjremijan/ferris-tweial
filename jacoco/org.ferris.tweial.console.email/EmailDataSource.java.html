@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailDataSource.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailDataSource.java</span></div><h1>EmailDataSource.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
+
+/**
+ * The purpose of this class is to provide a small abstraction to how the
+ * application is to get email account data.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+public class EmailDataSource {
+
+    private String description;
+    private boolean exists;
+
+    /**
+     * Constructor w/o error checking
+     *
+     * @param description Not error checked
+     * @param exists Not error checked
+     */
+<span class="fc" id="L20">    public EmailDataSource(String description, boolean exists) {</span>
+<span class="fc" id="L21">        this.description = description;</span>
+<span class="fc" id="L22">        this.exists = exists;</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * Basic getter for description
+     * @return {@link String}
+     */
+    public String getDescription() {
+<span class="fc" id="L30">        return description;</span>
+    }
+
+    /**
+     * Basic getter for exists
+     * @return {@link String}
+     */
+    public boolean exists() {
+<span class="fc" id="L38">        return exists;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

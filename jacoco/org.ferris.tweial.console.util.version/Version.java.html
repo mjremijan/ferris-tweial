@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>Version.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.util.version</a> &gt; <span class="el_source">Version.java</span></div><h1>Version.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.util.version;
+
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
+import org.apache.commons.lang3.StringUtils;
+
+<span class="fc" id="L9">public class Version {</span>
+
+    public static final String UNKOWN = &quot;&lt;unknown&gt;&quot;;
+
+    protected Package getPackage() {
+<span class="fc" id="L14">        Package p = null;</span>
+        try {
+<span class="fc" id="L16">            p = Package.getPackage(getClass().getPackage().getName());</span>
+<span class="nc" id="L17">        } catch (Throwable t) {</span>
+            // do nothing
+<span class="fc" id="L19">        }</span>
+<span class="fc" id="L20">        return p;</span>
+    }
+
+    /**
+     * @return {@link Package#getImplementationTitle() }
+     */
+    public String getImplementationTitle() {
+<span class="fc" id="L27">        String s = &quot;&quot;;</span>
+<span class="fc" id="L28">        Package pack = getPackage();</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (pack != null) {</span>
+<span class="fc" id="L30">            s = StringUtils.trimToEmpty(pack.getImplementationTitle());</span>
+        }
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (s.isEmpty()) {</span>
+<span class="fc" id="L33">            s = UNKOWN;</span>
+        }
+<span class="fc" id="L35">        return s;</span>
+    }
+
+    /**
+     * @return {@link Package#getImplementationVersion() }
+     */
+    public String getImplementationVersion() {
+<span class="fc" id="L42">        String s = &quot;&quot;;</span>
+<span class="fc" id="L43">        Package pack = getPackage();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (pack != null) {</span>
+<span class="fc" id="L45">            s = StringUtils.trimToEmpty(pack.getImplementationVersion());</span>
+        }
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (s.isEmpty()) {</span>
+<span class="fc" id="L48">            s = UNKOWN;</span>
+        }
+<span class="fc" id="L50">        return s;</span>
+    }
+
+    /**
+     * @return {@link Package#getImplementationVendor() }
+     */
+    public String getImplementationVendor() {
+<span class="fc" id="L57">        String s = &quot;&quot;;</span>
+<span class="fc" id="L58">        Package pack = getPackage();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">        if (pack != null) {</span>
+<span class="fc" id="L60">            s = StringUtils.trimToEmpty(pack.getImplementationVendor());</span>
+        }
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (s.isEmpty()) {</span>
+<span class="fc" id="L63">            s = UNKOWN;</span>
+        }
+<span class="fc" id="L65">        return s;</span>
+    }
+
+    public String getImplementationUrl() {
+<span class="nc" id="L69">        String s = &quot;&quot;;</span>
+        try {
+<span class="nc" id="L71">            URL fileUrl = this.getClass().getProtectionDomain().getCodeSource().getLocation();</span>
+<span class="nc" id="L72">            URL jarUrl = new URL(String.format(&quot;jar:%s!/&quot;, fileUrl.toString()));</span>
+<span class="nc" id="L73">            JarURLConnection jarConnection = (JarURLConnection) jarUrl.openConnection();</span>
+<span class="nc" id="L74">            Manifest manifest = jarConnection.getManifest();</span>
+<span class="nc" id="L75">            Attributes attributes = manifest.getMainAttributes();</span>
+<span class="nc" id="L76">            s = StringUtils.defaultIfBlank(attributes.getValue(&quot;Implementation-URL&quot;), UNKOWN);</span>
+<span class="nc" id="L77">        } catch (Exception e) {</span>
+<span class="nc" id="L78">            s = UNKOWN;</span>
+<span class="nc" id="L79">        }</span>
+<span class="nc" id="L80">        return s;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

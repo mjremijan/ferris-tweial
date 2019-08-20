@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>TweetFilter.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.twitter</a> &gt; <span class="el_source">TweetFilter.java</span></div><h1>TweetFilter.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.twitter;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.preferences.PreferencesHandler;
+import org.jboss.weld.experimental.Priority;
+import twitter4j.Status;
+
+/**
+ * The purpose of this class is to filter {@link List} objects of tweets
+ * from Twitter.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L19">public class TweetFilter {</span>
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected PreferencesHandler preferencesHandler;
+
+    /**
+     * Use the data in the {@link TweetRetrievalEvent} {@code event} parameter to
+     * filter out the tweets from Twitter that we have already seen. Set a new
+     * list in the {@link TweetRetrievalEvent} {@code event} parameter with the
+     * new tweets found in this run, in other words, all the tweets left over
+     * after filtering out the ones we have already seen in previous runs.
+     *
+     * @param event The {@link TweetRetrievalEvent} this method is responsible
+     * for calling {@link TweetRetrievalEvent#setNewTweetsFromThisRun(java.util.List)}
+     */
+    protected void filterTweets(
+        @Observes @Priority(TweetRetrievalPriority.FIND_NEW_TWEETS_FROM_THIS_RUN)
+        TweetRetrievalEvent event
+    ) {
+<span class="fc" id="L41">        log.info(&quot;Filter out tweets we've already seen&quot;);</span>
+
+        List&lt;Status&gt; newTweetsFromThisRun;
+
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (preferencesHandler.findPreferences().getGetOnlyThisTweetId() == -1)</span>
+        {
+<span class="fc" id="L47">            List&lt;Long&gt; idsFromLastRun</span>
+<span class="fc" id="L48">                = event.getTweetsFromLastRun().stream().map(t -&gt; t.getId()).collect(Collectors.toList());</span>
+
+<span class="fc" id="L50">            newTweetsFromThisRun</span>
+<span class="fc" id="L51">                = new LinkedList&lt;&gt;(event.getTweetsFromTwitter());</span>
+<span class="fc" id="L52">            newTweetsFromThisRun.removeIf(t -&gt; idsFromLastRun.contains(t.getId()));</span>
+<span class="fc" id="L53">        } else {</span>
+<span class="nc" id="L54">            newTweetsFromThisRun</span>
+<span class="nc" id="L55">                = new LinkedList&lt;&gt;(event.getTweetsFromTwitter());</span>
+        }
+<span class="fc" id="L57">        event.setNewTweetsFromThisRun(newTweetsFromThisRun);</span>
+<span class="fc" id="L58">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

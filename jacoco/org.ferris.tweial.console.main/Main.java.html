@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.main</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.main;
+
+import java.util.Arrays;
+import java.util.List;
+import javax.enterprise.event.Event;
+import javax.enterprise.inject.spi.CDI;
+import javax.inject.Inject;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.email.EmailSendEvent;
+import org.ferris.tweial.console.exit.ExitEvent;
+import org.ferris.tweial.console.twitter.TweetRetrievalEvent;
+
+/**
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L17">public class Main {</span>
+    public static void main(String[] args) {
+<span class="nc" id="L19">        CDI&lt;Object&gt; cdi = CDI.getCDIProvider().initialize();        </span>
+<span class="nc" id="L20">        Main main</span>
+<span class="nc" id="L21">            = cdi.select(Main.class).get();</span>
+<span class="nc" id="L22">        main.main(Arrays.asList(args));</span>
+<span class="nc" id="L23">    }</span>
+    
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected Event&lt;StartupEvent&gt; startupEvent;
+
+    @Inject
+    protected Event&lt;TweetRetrievalEvent&gt; tweetRetrievalEvent;
+
+    @Inject
+    protected Event&lt;EmailSendEvent&gt; emailSendEvent;
+
+    @Inject
+    protected Event&lt;ExitEvent&gt; exitEvent;
+    
+    protected void main(List&lt;String&gt; args) {
+<span class="fc" id="L41">        log.info(&quot;Fire StartupEvent&quot;);</span>
+<span class="fc" id="L42">        startupEvent.fire(new StartupEvent());</span>
+
+<span class="fc" id="L44">        log.info(&quot;Fire TweetRetrievalEvent&quot;);</span>
+<span class="fc" id="L45">        TweetRetrievalEvent trEvent = new TweetRetrievalEvent();</span>
+<span class="fc" id="L46">        tweetRetrievalEvent.fire(trEvent);</span>
+
+<span class="fc" id="L48">        log.info(&quot;Fire EmailSendEvent&quot;);</span>
+<span class="fc" id="L49">        EmailSendEvent esEvnt = new EmailSendEvent(trEvent.getNewTweetsFromThisRun());</span>
+<span class="fc" id="L50">        emailSendEvent.fire(esEvnt);</span>
+
+<span class="fc" id="L52">        log.info(&quot;Fire ExitEvent&quot;);</span>
+<span class="fc" id="L53">        exitEvent.fire(new ExitEvent());</span>
+<span class="fc" id="L54">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

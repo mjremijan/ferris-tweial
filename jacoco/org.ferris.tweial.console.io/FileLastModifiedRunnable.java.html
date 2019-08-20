@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>FileLastModifiedRunnable.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.io</a> &gt; <span class="el_source">FileLastModifiedRunnable.java</span></div><h1>FileLastModifiedRunnable.java</h1><pre class="source lang-java linenums">/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.ferris.tweial.console.io;
+
+import java.io.File;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import org.apache.log4j.Logger;
+
+/**
+ * This is a Runnable implementation given to a ScheduledExecutorService to
+ * watch a file's lastModified property to detect if the file has changed. If
+ * so, a FileLastModifiedEvent event is fired.
+ *
+ * This class is @Dependent scope so each injection point should get its own
+ * instances. Hence, once injected into your bean it should be safe to call the
+ * #setFile() method then hand this off to a ScheduledExecutorService.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+@Dependent
+public class FileLastModifiedRunnable implements Runnable {
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected Event&lt;FileLastModifiedEvent&gt; event;
+
+    protected File file;
+    protected long lastModifiedThen;
+
+    /**
+     * Set the &quot;file&quot; and &quot;lastModifiedThen&quot; object properties
+     *
+     * @param f No error checking is performed.
+     */
+<span class="fc" id="L42">    protected FileLastModifiedRunnable(File f) {</span>
+<span class="fc" id="L43">        file = f;</span>
+<span class="fc" id="L44">        lastModifiedThen = file.lastModified();</span>
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * Basic getter
+     *
+     * @return Object property &quot;file&quot;
+     */
+    public File getFile() {
+<span class="fc" id="L53">        return file;</span>
+    }
+
+    /**
+     * Compares {@link File#lastModified()} with object property
+     * {@link #lastModifiedThen} and if there is a difference, fire a
+     * {@link FileLastModifiedEvent}
+     */
+    @Override
+    public void run() {
+<span class="fc" id="L63">        log.debug(String.format(&quot;Checking lastModified for file \&quot;%s\&quot;&quot;, file.getAbsolutePath()));</span>
+<span class="fc" id="L64">        long lastModifiedNow = file.lastModified();</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (lastModifiedNow != lastModifiedThen) {</span>
+<span class="fc" id="L66">            log.warn(String.format(&quot;Modification detected for file \&quot;%s\&quot;&quot;, file.getAbsolutePath()));</span>
+<span class="fc" id="L67">            FileLastModifiedEvent event</span>
+                    = new FileLastModifiedEvent(lastModifiedThen, lastModifiedNow, file);
+<span class="fc" id="L69">            lastModifiedThen = lastModifiedNow;</span>
+<span class="fc" id="L70">            this.event.fire(event);</span>
+        }
+<span class="fc" id="L72">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

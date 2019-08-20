@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailRendererByFreeMarker.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailRendererByFreeMarker.java</span></div><h1>EmailRendererByFreeMarker.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateExceptionHandler;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.configuration.ConfigurationDirectory;
+import org.ferris.tweial.console.preferences.PreferencesHandler;
+import org.ferris.tweial.console.util.version.Version;
+import org.jboss.weld.experimental.Priority;
+import twitter4j.Status;
+
+/**
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L26">public class EmailRendererByFreeMarker {</span>
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected ConfigurationDirectory configurationDirectory;
+
+    @Inject
+    protected Version version;
+
+    @Inject
+    protected EmailTweetBuilder emailTweetBuilder;
+
+    @Inject
+    protected PreferencesHandler preferencesHandler;
+
+<span class="fc" id="L42">    protected String subjectTemplateName = &quot;email_subject.ftlt&quot;;</span>
+
+<span class="fc" id="L44">    protected String emailTemplateName = &quot;email_message.ftlt&quot;;</span>
+
+    private Template subjectTemplate, messageTemplate;
+
+    @PostConstruct
+    protected void postConstruct() {
+        try {
+            // -------------------- Create a configuration instance
+            // Create your Configuration instance, and specify if up to what FreeMarker
+            // version (here 2.3.25) do you want to apply the fixes that are not 100%
+            // backward-compatible. See the Configuration JavaDoc for details.
+<span class="fc" id="L55">            Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);</span>
+
+            // Specify the source where the template files come from. Here I set a
+            // plain directory for it, but non-file-system sources are possible too:
+<span class="fc" id="L59">            cfg.setDirectoryForTemplateLoading(configurationDirectory);</span>
+
+            // Set the preferred charset template files are stored in. UTF-8 is
+            // a good choice in most applications:
+<span class="fc" id="L63">            cfg.setDefaultEncoding(&quot;UTF-8&quot;);</span>
+
+            // Sets how errors will appear.
+            // During web page *development* TemplateExceptionHandler.HTML_DEBUG_HANDLER is better.
+<span class="fc" id="L67">            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);</span>
+
+            // Don't log exceptions inside FreeMarker that it will thrown at you anyway:
+<span class="fc" id="L70">            cfg.setLogTemplateExceptions(false);</span>
+
+            // Subject template
+<span class="fc" id="L73">            subjectTemplate = cfg.getTemplate(subjectTemplateName);</span>
+
+            // Body template
+<span class="fc" id="L76">            messageTemplate = cfg.getTemplate(emailTemplateName);</span>
+<span class="nc" id="L77">        } catch (Exception e) {</span>
+<span class="nc" id="L78">            throw new RuntimeException(e);</span>
+<span class="fc" id="L79">        }</span>
+<span class="fc" id="L80">    }</span>
+
+    public void render(
+        @Observes @Priority(EmailSendPriority.RENDER_EMAIL_MESSAGE)
+        EmailSendEvent evnt
+    ) {
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if (evnt.getTweets().isEmpty()) {</span>
+<span class="nc" id="L87">            evnt.setSubject(&quot;&quot;);</span>
+<span class="nc" id="L88">            evnt.setMessage(&quot;&quot;);</span>
+<span class="nc" id="L89">            return;</span>
+        }
+
+<span class="nc" id="L92">        evnt.setSubject(renderSubject());</span>
+<span class="nc" id="L93">        evnt.setMessage(renderMessage(evnt.getTweets()));</span>
+<span class="nc" id="L94">    }</span>
+
+
+
+    protected String renderMessage(List&lt;Status&gt; statuses) {
+        // List of tweets
+<span class="fc" id="L100">        List&lt;EmailTweet&gt; tweets = new ArrayList&lt;&gt;(statuses.size());</span>
+<span class="fc" id="L101">        statuses.forEach(s -&gt; {</span>
+<span class="fc" id="L102">            tweets.add(emailTweetBuilder.build(s));</span>
+<span class="fc" id="L103">        });</span>
+
+        // Project final name
+<span class="fc" id="L106">        String projectFinalName</span>
+<span class="fc" id="L107">            = String.format(&quot;%s-%s&quot;, version.getImplementationTitle(), version.getImplementationVersion());</span>
+
+        // Project url
+<span class="fc" id="L110">        String projectUrl</span>
+<span class="fc" id="L111">            = version.getImplementationUrl();</span>
+
+        // Render
+<span class="fc" id="L114">        Writer out = new StringWriter();</span>
+        try {
+<span class="fc" id="L116">            Map&lt;String, Object&gt; root = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L117">            root.put(&quot;tweets&quot;, tweets);</span>
+<span class="fc" id="L118">            root.put(&quot;projectFinalName&quot;, projectFinalName);</span>
+<span class="fc" id="L119">            root.put(&quot;projectUrl&quot;, projectUrl);</span>
+<span class="fc" id="L120">            root.put(&quot;photoErrorUrl&quot;, preferencesHandler.findPreferences().getNoImageUrl());</span>
+<span class="fc" id="L121">            messageTemplate.process(root, out);</span>
+<span class="fc" id="L122">            out.flush();</span>
+<span class="nc" id="L123">        } catch (Exception ex) {</span>
+<span class="nc" id="L124">            throw new RuntimeException(</span>
+<span class="nc" id="L125">                  String.format(&quot;Problem rendering the email message&quot;)</span>
+                , ex
+            );
+<span class="fc" id="L128">        }</span>
+<span class="fc" id="L129">        return out.toString();</span>
+    }
+
+    protected String renderSubject() {
+<span class="fc" id="L133">        Writer out = new StringWriter();</span>
+        try {
+<span class="fc" id="L135">            Map&lt;String, Object&gt; root = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L136">            root.put(&quot;searchDescription&quot;, &quot;Home activity&quot;);</span>
+<span class="fc" id="L137">            subjectTemplate.process(root, out);</span>
+<span class="fc" id="L138">            out.flush();</span>
+<span class="nc" id="L139">        } catch (Exception ex) {</span>
+<span class="nc" id="L140">            throw new RuntimeException(</span>
+<span class="nc" id="L141">                String.format(&quot;Problem rendering the email subject&quot;)</span>
+                , ex
+            );
+<span class="fc" id="L144">        }</span>
+<span class="fc" id="L145">        return out.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

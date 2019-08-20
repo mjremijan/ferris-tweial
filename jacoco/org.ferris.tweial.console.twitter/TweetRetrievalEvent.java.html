@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>TweetRetrievalEvent.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.twitter</a> &gt; <span class="el_source">TweetRetrievalEvent.java</span></div><h1>TweetRetrievalEvent.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.twitter;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import twitter4j.Status;
+
+/**
+ * This event supports the data needed during the tweet retrieval process 
+ * to determine which tweets, if any, will emailed to the user.
+ * 
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L14">public class TweetRetrievalEvent {</span>
+    private List&lt;Status&gt; tweetsFromLastRun;
+    private List&lt;Status&gt; tweetsFromTwitter;
+    private List&lt;Status&gt; newTweetsFromThisRun;
+    
+    /** 
+     * Store the list of tweets found during the last time Tweial ran. A
+     * reference to the {@code tweetsFromLastRun} property is NOT kept. A
+     * new {@link List}&amp;lt;{@link Status}&amp;gt; is created and all the 
+     * {@link Status} objects in the {@code tweetsFromLastRun} parameter are
+     * copied into the new {@link List}
+     * 
+     * @param tweetsFromLastRun No validation on its value
+     */
+    public void setTweetsFromLastRun(List&lt;Status&gt; tweetsFromLastRun) {
+<span class="fc" id="L29">        this.tweetsFromLastRun = new LinkedList&lt;Status&gt;();</span>
+<span class="fc" id="L30">        this.tweetsFromLastRun.addAll(tweetsFromLastRun);</span>
+<span class="fc" id="L31">    }</span>
+    
+    
+    /** 
+     * Store the list of tweets from twitter found during this run. A
+     * reference to the {@code tweetsFromTwitter} property is NOT kept. A
+     * new {@link List}&amp;lt;{@link Status}&amp;gt; is created and all the 
+     * {@link Status} objects in the {@code tweetsFromTwitter} parameter are
+     * copied into the new {@link List}
+     * 
+     * @param tweetsFromTwitter No validation on its value
+     */
+    public void setTweetsFromTwitter(List&lt;Status&gt; tweetsFromTwitter) {
+<span class="fc" id="L44">        this.tweetsFromTwitter = new LinkedList&lt;Status&gt;();</span>
+<span class="fc" id="L45">        this.tweetsFromTwitter.addAll(tweetsFromTwitter);</span>
+<span class="fc" id="L46">    }</span>
+    
+    
+    /** 
+     * Store the list of tweets from twitter found during this run which
+     * were NOT found during a previous run of Tweial.  See the 
+     * {@link TweetFilter} which actually produces this list. A
+     * reference to the {@code newTweetsFromThisRun} property is NOT kept. A
+     * new {@link List}&amp;lt;{@link Status}&amp;gt; is created and all the 
+     * {@link Status} objects in the {@code newTweetsFromThisRun} parameter are
+     * copied into the new {@link List}
+     * 
+     * @param newTweetsFromThisRun No validation on its value
+     */
+   
+    public void setNewTweetsFromThisRun(List&lt;Status&gt; newTweetsFromThisRun) {
+<span class="fc" id="L62">        this.newTweetsFromThisRun = new LinkedList&lt;Status&gt;();</span>
+<span class="fc" id="L63">        this.newTweetsFromThisRun.addAll(newTweetsFromThisRun);</span>
+<span class="fc" id="L64">    }</span>
+
+    
+    /**
+     * Return an unmodifiable {@link List}&amp;lt;{@link Status}&amp;gt;.
+     * 
+     * @return 
+     *  A {@link List}&amp;lt;{@link Status}&amp;gt; is always returned, never
+     *  {@code null}.  An empty {@link List}&amp;lt;{@link Status}&amp;gt; is
+     *  returned in place of {@code null}.
+     */
+    public List&lt;Status&gt; getTweetsFromLastRun() {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        return (tweetsFromLastRun == null) ? Collections.emptyList() : Collections.unmodifiableList(tweetsFromLastRun);</span>
+    }
+
+    
+    /**
+     * Return an unmodifiable {@link List}&amp;lt;{@link Status}&amp;gt;.
+     * 
+     * @return 
+     *  A {@link List}&amp;lt;{@link Status}&amp;gt; is always returned, never
+     *  {@code null}.  An empty {@link List}&amp;lt;{@link Status}&amp;gt; is
+     *  returned in place of {@code null}.
+     */
+    public List&lt;Status&gt; getTweetsFromTwitter() {
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        return (tweetsFromTwitter == null) ? Collections.emptyList() : Collections.unmodifiableList(tweetsFromTwitter);</span>
+    }
+    
+    
+    /**
+     * Return an unmodifiable {@link List}&amp;lt;{@link Status}&amp;gt;.
+     * 
+     * @return 
+     *  A {@link List}&amp;lt;{@link Status}&amp;gt; is always returned, never
+     *  {@code null}.  An empty {@link List}&amp;lt;{@link Status}&amp;gt; is
+     *  returned in place of {@code null}.
+     */
+    public List&lt;Status&gt; getNewTweetsFromThisRun() {
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        return (newTweetsFromThisRun == null) ? Collections.emptyList() : Collections.unmodifiableList(newTweetsFromThisRun);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

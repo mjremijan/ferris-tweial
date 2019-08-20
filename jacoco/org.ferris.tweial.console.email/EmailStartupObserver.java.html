@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailStartupObserver.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailStartupObserver.java</span></div><h1>EmailStartupObserver.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
+
+import java.util.Set;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.exit.ExitEvent;
+import org.ferris.tweial.console.main.StartupEvent;
+import org.ferris.tweial.console.main.StartupPriority;
+import org.jboss.weld.experimental.Priority;
+
+/**
+ * This class is an event observer for email related actions.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L19">public class EmailStartupObserver {</span>
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected EmailHandler handler;
+
+    @Inject
+    protected EmailPage page;
+
+    @Inject
+    protected Event&lt;ExitEvent&gt; exitEvent;
+
+    /**
+     * Observe the {@link StartupEvent} so the email datasource can be verified.
+     * This process just checks to see that whatever is holding the email
+     * data exists and is accessible.  It doesn't matter what is actually
+     * holding the data (database, flat file, ldap, MongoDB, etc.) and it
+     * does not matter if the data is actually in the data source. All this 
+     * verification checks for is that the data source exists and is accessible
+     *
+     * @param event The {@link StartupEvent} which is not used by this method.
+     */
+    public void emailDataSourceVerification(
+        @Observes @Priority(StartupPriority.EMAIL_DATASOURCE_VERIFICATION) 
+        StartupEvent event
+    ){
+<span class="fc" id="L47">        log.info(&quot;Email data source verification&quot;);</span>
+<span class="fc" id="L48">        EmailDataSource dataSource = handler.getEmailAccountDataSource();</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if (!dataSource.exists()) {</span>
+<span class="fc" id="L50">            page.viewDataSourceMissing(dataSource.getDescription());</span>
+<span class="fc" id="L51">            exitEvent.fire(new ExitEvent());</span>
+        }
+<span class="fc" id="L53">    }</span>
+
+    
+    /**
+     * Observes the {@link StartupEvent} so that the email account data can 
+     * be verified. This is basic verification that the properties exist and 
+     * have some reasonable checks on their values.  It does NOT verify that
+     * the email account actually exists or that the account data can be used
+     * to successfully send and email.
+     * 
+     * @param event he {@link StartupEvent} which is not used by this method.
+     */
+    public void emailAccountVerification(
+        @Observes @Priority(StartupPriority.EMAIL_ACCOUNT_VERIFICATION) 
+        StartupEvent event
+    ){
+<span class="fc" id="L69">        log.info(&quot;Email account verification&quot;);</span>
+<span class="fc" id="L70">        EmailAccount account = handler.getEmailAccount();</span>
+<span class="fc" id="L71">        Set&lt;ConstraintViolation&lt;EmailAccount&gt;&gt; violations = handler.validate(account);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (!violations.isEmpty()) {</span>
+<span class="fc" id="L73">            page.viewEmailAccountMissing(violations);</span>
+<span class="fc" id="L74">            exitEvent.fire(new ExitEvent());</span>
+        }
+<span class="fc" id="L76">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

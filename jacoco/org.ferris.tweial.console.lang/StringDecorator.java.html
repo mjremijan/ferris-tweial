@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>StringDecorator.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.lang</a> &gt; <span class="el_source">StringDecorator.java</span></div><h1>StringDecorator.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.lang;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import org.ferris.tweial.console.util.ArrayTools;
+
+/**
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+public class StringDecorator {
+
+    @FunctionalInterface
+    public static interface Decorator {
+
+        /**
+         * The string parameter is decorated and returned
+         *
+         * @param decorateMe The string that's to be decorated
+         *
+         * @return The decorated string
+         */
+        public String decorate(String decorateMe);
+    }
+
+    protected static class Decorating {
+
+        int min, max;
+        Decorator decorator;
+        String text;
+
+<span class="fc" id="L35">        public Decorating(int min, int max, Decorator decorator) {</span>
+<span class="fc" id="L36">            this.min = min;</span>
+<span class="fc" id="L37">            this.max = max;</span>
+<span class="fc" id="L38">            this.decorator = decorator;</span>
+<span class="fc" id="L39">            this.text = &quot;&quot;;</span>
+<span class="fc" id="L40">        }</span>
+
+        public Decorating setString(String s) {
+<span class="fc" id="L43">            text = s;</span>
+<span class="fc" id="L44">            return this;</span>
+        }
+
+        @Override
+        public String toString() {
+<span class="nc" id="L49">            return this.text;</span>
+        }
+
+        public String toStringDecorated() {
+<span class="fc" id="L53">            return decorator.decorate(this.text);</span>
+        }
+
+        public boolean isOverlapping(Decorating a) {
+<span class="fc bfc" id="L57" title="All 2 branches covered.">            return Math.max(this.min, a.min) &lt;= Math.min(this.max, a.max);</span>
+        }
+    }
+
+    private char[] codePointCharacters;
+    private Map&lt;Integer, Decorating&gt; decorators;
+    private List&lt;UnicodeCharacter&gt; unicodeCharacters;
+
+<span class="fc" id="L65">    public StringDecorator(String text) {</span>
+<span class="fc" id="L66">        codePointCharacters</span>
+            = new char[]{};
+
+<span class="fc" id="L69">        unicodeCharacters</span>
+            = new LinkedList&lt;&gt;();
+
+<span class="fc" id="L72">        decorators</span>
+            = new HashMap&lt;&gt;();
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        for (int offset = 0; offset &lt; text.length();) {</span>
+            // Get the codepoint at the offset
+<span class="fc" id="L77">            UnicodeCharacter unicodeCharacter</span>
+<span class="fc" id="L78">                = new UnicodeCharacter(text.codePointAt(offset));</span>
+
+            // Get utf-16 characters
+<span class="fc" id="L81">            char[] chars = unicodeCharacter.chars();</span>
+
+            // Change the offset appropriately based on codepoint
+<span class="fc" id="L84">            offset += unicodeCharacter.charCount();</span>
+
+            // Store
+<span class="fc" id="L87">            codePointCharacters = ArrayTools.concat(codePointCharacters, chars);</span>
+<span class="fc" id="L88">            unicodeCharacters.add(unicodeCharacter);</span>
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">    }</span>
+
+    public List&lt;UnicodeCharacter&gt; getUnicodeCharacters() {
+<span class="nc" id="L93">        return unicodeCharacters;</span>
+    }
+
+    public void decorate(int startInclusive, int endInclusive, Decorator decorator) {
+        // Basic index out of bounds error checking
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (startInclusive &lt; 0) {</span>
+<span class="nc" id="L99">            throw new ArrayIndexOutOfBoundsException(</span>
+<span class="nc" id="L100">                String.format(</span>
+                    &quot;Value for startInclusive [%d] is out of range&quot;,
+<span class="nc" id="L102">                    startInclusive</span>
+                ));
+        }
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (endInclusive &gt;= codePointCharacters.length) {</span>
+<span class="nc" id="L106">            throw new ArrayIndexOutOfBoundsException(</span>
+<span class="nc" id="L107">                String.format(</span>
+                    &quot;Value for endInclusive [%d] is out of range [%d] &quot;,
+<span class="nc" id="L109">                    endInclusive,</span>
+<span class="nc" id="L110">                    codePointCharacters.length</span>
+                ));
+        }
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if (endInclusive &lt; startInclusive) {</span>
+<span class="nc" id="L114">            throw new ArrayIndexOutOfBoundsException(</span>
+<span class="nc" id="L115">                String.format(</span>
+                    &quot;Value for index range not valid: startInclusive [%d], endInclusive [%d]&quot;,
+<span class="nc" id="L117">                    startInclusive, endInclusive</span>
+                ));
+        }
+
+        // Holder for decorator information
+<span class="fc" id="L122">        Decorating holder = new Decorating(startInclusive, endInclusive, decorator);</span>
+
+        // Does this range overlap with any other range?
+<span class="fc" id="L125">        decorators.values().forEach(a -&gt; {</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if (a.isOverlapping(holder)) {</span>
+<span class="fc" id="L127">                throw new RuntimeException(</span>
+<span class="fc" id="L128">                    String.format(</span>
+                        &quot;Decorator range [%d,%d] overlaps with existing range [%d,%d]&quot;,
+<span class="fc" id="L130">                        holder.min, holder.max,</span>
+<span class="fc" id="L131">                        a.min, a.max</span>
+                    )
+                );
+            }
+<span class="fc" id="L135">        });</span>
+
+        // No overlap, so build string to store in the holder.
+<span class="fc" id="L138">        holder.setString(</span>
+<span class="fc" id="L139">            new String(Arrays.copyOfRange(codePointCharacters, holder.min, holder.max + 1))</span>
+        );
+
+        // Store the holder
+<span class="fc" id="L143">        decorators.put(holder.min, holder);</span>
+<span class="fc" id="L144">    }</span>
+
+    public void decorate(String src, Decorator decorator) {
+<span class="fc" id="L147">        StringDecorator param = new StringDecorator(src);</span>
+<span class="fc" id="L148">        int i = 0;</span>
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        while ((i = ArrayTools.indexOfSubArray(this.codePointCharacters, param.codePointCharacters, i)) != -1) {</span>
+<span class="fc" id="L150">            this.decorate(i, i + (param.codePointCharacters.length - 1), decorator);</span>
+<span class="fc" id="L151">            i = i + param.codePointCharacters.length;</span>
+        }
+<span class="fc" id="L153">    }</span>
+
+    @Override
+    public String toString() {
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if (codePointCharacters.length == 0) {</span>
+<span class="fc" id="L158">            return &quot;&quot;;</span>
+        } else {
+<span class="fc" id="L160">            return new String(codePointCharacters);</span>
+        }
+    }
+
+    public String toStringDecorated() {
+<span class="fc" id="L165">        int[] idx = new int[]{0};</span>
+<span class="fc" id="L166">        StringBuilder sp = new StringBuilder();</span>
+
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        for (int i = 0; i &lt; codePointCharacters.length; i++) {</span>
+            // Does a Decorator exists at this index?
+<span class="fc bfc" id="L170" title="All 2 branches covered.">            if (decorators.containsKey(i)) {</span>
+<span class="fc" id="L171">                Decorating d = decorators.get(i);</span>
+<span class="fc" id="L172">                sp.append(d.toStringDecorated());</span>
+<span class="fc" id="L173">                i = d.max;</span>
+<span class="fc" id="L174">            } // No Decorator, just add the character</span>
+            else {
+<span class="fc" id="L176">                sp.append(codePointCharacters[i]);</span>
+            }
+        }
+<span class="fc" id="L179">        return sp.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

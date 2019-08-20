@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>PatternForYouTube.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.util</a> &gt; <span class="el_source">PatternForYouTube.java</span></div><h1>PatternForYouTube.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.util;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+public class PatternForYouTube {
+
+<span class="fc" id="L12">    protected Pattern p = Pattern.compile(&quot;https?:\\/\\/www\\.youtube\\.com\\/watch\\?v=(.+)&quot;);</span>
+
+<span class="fc" id="L14">    protected boolean matches = false;</span>
+    public boolean matches() {
+<span class="fc" id="L16">        return matches;</span>
+    }
+
+    public String vidId;
+    public String getVidId() {
+<span class="fc" id="L21">        return vidId;</span>
+    }
+
+<span class="fc" id="L24">    public PatternForYouTube(String url) {</span>
+<span class="fc" id="L25">        Matcher m = p.matcher(url);</span>
+<span class="pc bpc" id="L26" title="1 of 4 branches missed.">        if (m.matches() &amp;&amp; m.groupCount() == 1) {</span>
+<span class="fc" id="L27">            this.matches = true;</span>
+<span class="fc" id="L28">            this.vidId = m.group(1);</span>
+        }
+<span class="fc" id="L30">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

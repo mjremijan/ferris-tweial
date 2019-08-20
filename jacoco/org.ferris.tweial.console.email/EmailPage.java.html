@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailPage.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailPage.java</span></div><h1>EmailPage.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
+
+import java.util.Set;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.io.Console;
+import org.ferris.tweial.console.text.i18n.LocalizedString;
+import org.ferris.tweial.console.text.i18n.LocalizedStringKey;
+import org.ferris.tweial.console.view.page.AbstractPage;
+import org.jboss.weld.experimental.Priority;
+
+/**
+ * This is the console view for email related information.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L19">public class EmailPage extends AbstractPage {</span>
+
+    @Inject
+    protected Console console;
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    @LocalizedStringKey(&quot;EmailPage.DataSourceMissing&quot;)
+    protected LocalizedString dataSourceMissing;
+
+    @Inject
+    @LocalizedStringKey(&quot;EmailPage.AccountDataMissing&quot;)
+    protected LocalizedString accountDataMissing;
+
+    @Inject
+    @LocalizedStringKey(&quot;EmailPage.Heading&quot;)
+    protected LocalizedString heading;
+
+    public void viewDataSourceMissing(String description) {
+<span class="fc" id="L40">        log.info(&quot;Email account configuration file is missing&quot;);</span>
+<span class="fc" id="L41">        console.h1(heading);</span>
+<span class="fc" id="L42">        console.p(dataSourceMissing, description);</span>
+<span class="fc" id="L43">    }</span>
+
+    public void viewEmailAccountMissing(Set&lt;ConstraintViolation&lt;EmailAccount&gt;&gt; violations) {
+<span class="fc" id="L46">        log.info(&quot;Email account data is missing&quot;);</span>
+<span class="fc" id="L47">        console.h1(heading);</span>
+<span class="fc" id="L48">        console.p(accountDataMissing);</span>
+<span class="fc" id="L49">        console.print(violations);</span>
+<span class="fc" id="L50">    }</span>
+    
+    public void render(
+        @Observes @Priority(EmailSendPriority.PRINT_EMAIL_MESSAGE)
+        EmailSendEvent evnt
+    ) {
+<span class="nc" id="L56">        log.info(&quot;Email message:&quot;);</span>
+<span class="nc" id="L57">        log.info(evnt.getMessage());</span>
+<span class="nc" id="L58">        console.p(new LocalizedString(&quot;See log file for email message&quot;));</span>
+<span class="nc" id="L59">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

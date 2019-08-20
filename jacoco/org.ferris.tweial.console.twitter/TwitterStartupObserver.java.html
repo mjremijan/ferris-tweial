@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>TwitterStartupObserver.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.twitter</a> &gt; <span class="el_source">TwitterStartupObserver.java</span></div><h1>TwitterStartupObserver.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.twitter;
+
+import java.util.Set;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.exit.ExitEvent;
+import org.ferris.tweial.console.main.StartupEvent;
+import org.ferris.tweial.console.main.StartupPriority;
+import org.jboss.weld.experimental.Priority;
+
+/**
+ * This class is an event observer for Twitter related actions.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="nc" id="L19">public class TwitterStartupObserver {</span>
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected TwitterHandler handler;
+
+    @Inject
+    protected TwitterPage page;
+
+    @Inject
+    protected Event&lt;ExitEvent&gt; exitEvent;
+
+    /**
+     * Observe the {@link StartupEvent} so the application can verify the information needed for the source of
+     * the Twitter authentication data exists. This can either be in a properties file, a database, or an LDAP
+     * server. It really doesn't matter, just as long as the source of the Twitter authentication data exits.
+     *
+     * @param event Not used.
+     */
+    public void twitterDataSourceVerification(
+            @Observes @Priority(StartupPriority.TWITTER_DATASOURCE_VERIFICATION) StartupEvent event
+    ) {
+<span class="nc" id="L43">        log.info(&quot;Twitter data source verification&quot;);</span>
+<span class="nc" id="L44">        TwitterDataSource dataSource = handler.getTwitterDataSource();</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (!dataSource.exists()) {</span>
+<span class="nc" id="L46">            page.viewDataSourceMissing(dataSource.getDescription());</span>
+<span class="nc" id="L47">            exitEvent.fire(new ExitEvent());</span>
+        }
+<span class="nc" id="L49">    }</span>
+
+    /**
+     * Observe the {@link StartupEvent} so the application can verify the Twitter account data itself.
+     *
+     * @param event Not used.
+     */
+    public void twitterAccountVerification(
+            @Observes @Priority(StartupPriority.TWITTER_ACCOUNT_VERIFICATION) StartupEvent event
+    ) {
+<span class="nc" id="L59">        log.info(&quot;Twitter account verification&quot;);</span>
+<span class="nc" id="L60">        TwitterAccount auth = handler.getTwitterAccount();</span>
+<span class="nc" id="L61">        Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; violations</span>
+<span class="nc" id="L62">                = handler.validate(auth);</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (!violations.isEmpty()) {</span>
+<span class="nc" id="L64">            page.viewTwitterAccountMissing(violations);</span>
+<span class="nc" id="L65">            exitEvent.fire(new ExitEvent());</span>
+        }
+<span class="nc" id="L67">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

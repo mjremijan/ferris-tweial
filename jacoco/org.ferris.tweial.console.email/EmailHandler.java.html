@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailHandler.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailHandler.java</span></div><h1>EmailHandler.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
+
+import java.util.Set;
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.ValidatorFactory;
+import org.apache.log4j.Logger;
+
+/**
+ * This class contains the business logic for handling email related data.
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="fc" id="L14">public class EmailHandler {</span>
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected EmailPropertiesFile emailProperties;
+
+    @Inject
+    protected ValidatorFactory validatorFactory;
+
+    /**
+     * Get email account information
+     * 
+     * @return Return an {@link EmailAccount} instance. Never returns
+     * {@code null}. If no account data is found, an {@link EmailAccount}
+     * instance is returned with all its properties set to null.
+     */
+    public EmailAccount getEmailAccount() {
+<span class="fc" id="L33">        log.info(&quot;Create EmailAccount from properties&quot;);</span>
+<span class="fc" id="L34">        return new EmailAccount(emailProperties.toProperties());</span>
+    }
+
+    /**
+     * Validates the email account data and returns the constraints.  If there
+     * are no constraint violations, an empty set is returned.
+     *
+     * @param validateMe The EmailAccount data to be validated.
+     * @return Returns constraint violations or an empty set if none.    
+     */
+    public Set&lt;ConstraintViolation&lt;EmailAccount&gt;&gt; validate(EmailAccount validateMe) {
+<span class="fc" id="L45">        log.info(&quot;Validate the EmailAccount object&quot;);</span>
+<span class="fc" id="L46">        Set&lt;ConstraintViolation&lt;EmailAccount&gt;&gt; violations</span>
+<span class="fc" id="L47">                = validatorFactory.getValidator().validate(validateMe);</span>
+<span class="fc" id="L48">        return violations;</span>
+    }
+
+    /**
+     * The purpose of this method is to provide the application an abstraction
+     * about the source of the email account data. The specifics of what this
+     * source is doesn't matter (database, file, ldap, etc.).
+     * 
+     * @return {@link EmailDataSource}
+     */
+    public EmailDataSource getEmailAccountDataSource() {
+<span class="fc" id="L59">        return new EmailDataSource(</span>
+<span class="fc" id="L60">                emailProperties.getAbsolutePath(), emailProperties.exists()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>TwitterHandler.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.twitter</a> &gt; <span class="el_source">TwitterHandler.java</span></div><h1>TwitterHandler.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.twitter;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.ValidatorFactory;
+import org.apache.log4j.Logger;
+import org.ferris.tweial.console.preferences.PreferencesHandler;
+import org.jboss.weld.experimental.Priority;
+import twitter4j.Status;
+import twitter4j.Twitter;
+
+/**
+ * This class handles dealing with Twitter data
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+<span class="nc" id="L22">public class TwitterHandler {</span>
+
+    @Inject
+    protected Logger log;
+
+    @Inject
+    protected TwitterPropertiesFile twitterProperties;
+
+    @Inject
+    protected TwitterCacheFile twitterCache;
+
+    @Inject
+    protected ValidatorFactory validatorFactory;
+
+    @Inject
+    protected TwitterBuilder twitterBuilder;
+
+    @Inject
+    protected PreferencesHandler preferencesHandler;
+
+    /**
+     * Return {@link TwitterAccount} instance.
+     *
+     * @return A {@link TwitterAccount} instance is returned. Never
+     * returns &lt;code&gt;null&lt;/code&gt;. If no authentication data is found, a
+     * {@link TwitterAccount} instance is returned with all its
+     * properties set to null.
+     */
+    public TwitterAccount getTwitterAccount() {
+<span class="nc" id="L51">        log.info(&quot;Create TwitterAccount from properties&quot;);</span>
+<span class="nc" id="L52">        return new TwitterAccount(twitterProperties.toProperties());</span>
+    }
+
+    /**
+     * Validates the Twitter authentication data and returns the constraints. If
+     * there are no constraint violations, an empty set is returned.
+     *
+     * @param validateMe The {@link TwitterAccount} to validate
+
+     * @return Returns constraint violations or an empty set if none.
+     */
+    public Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; validate(TwitterAccount validateMe) {
+<span class="nc" id="L64">        log.info(&quot;Validate the TwitterAccount object&quot;);</span>
+<span class="nc" id="L65">        Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; violations</span>
+<span class="nc" id="L66">                = validatorFactory.getValidator().validate(validateMe);</span>
+<span class="nc" id="L67">        return violations;</span>
+    }
+
+    /**
+     * The purpose of this method is to provide the application an abstraction
+     * about the source of the twitter data. The specifics of what this source
+     * is doesn't matter (database, file, ldap, etc.).
+     *
+     * @return A {@link TwitterDataSource}.
+     */
+    public TwitterDataSource getTwitterDataSource() {
+<span class="nc" id="L78">        log.info(&quot;Get the Twitter data source&quot;);</span>
+<span class="nc" id="L79">        String desc = twitterProperties.getAbsolutePath();</span>
+<span class="nc" id="L80">        boolean exists = twitterProperties.exists();</span>
+<span class="nc" id="L81">        return new TwitterDataSource(desc, exists);</span>
+    }
+
+    /**
+     * Get the status from your twitter home timeline.
+     *
+     * @param event This method responsible for calling
+     * {@link TweetRetrievalEvent#setTweetsFromTwitter(java.util.List)}
+     */
+    protected void loadTweetsFromTwitter(@Observes @Priority(TweetRetrievalPriority.LOAD_TWEETS_FROM_TWITTER) TweetRetrievalEvent event) {
+<span class="nc" id="L91">        log.info(&quot;Load the Twitter home timeline&quot;);</span>
+
+<span class="nc" id="L93">        Twitter twitter = twitterBuilder</span>
+<span class="nc" id="L94">            .setAccount(getTwitterAccount())</span>
+<span class="nc" id="L95">            .build();</span>
+
+<span class="nc" id="L97">        List&lt;Status&gt; retval = null;</span>
+        try {
+<span class="nc" id="L99">            Long id = preferencesHandler.findPreferences().getGetOnlyThisTweetId();</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (id == -1) {</span>
+<span class="nc" id="L101">                retval = twitter.getHomeTimeline();</span>
+            } else {
+<span class="nc" id="L103">                retval = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L104">                Collections.addAll(retval, twitter.showStatus(id));</span>
+            }
+<span class="nc" id="L106">        } catch (Exception e) {</span>
+<span class="nc" id="L107">            throw new RuntimeException(&quot;Failure getting Twitter home timeline&quot;, e);</span>
+<span class="nc" id="L108">        }</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (retval == null) {</span>
+<span class="nc" id="L110">            retval = Collections.emptyList();</span>
+        }
+
+<span class="nc" id="L113">        event.setTweetsFromTwitter(retval);</span>
+<span class="nc" id="L114">    }</span>
+
+
+    /**
+     * Get the tweets Tweial found during its last run and load them into the
+     * {@link TweetRetrievalEvent} parameter
+     *
+     * @param event No validation performed on this parameter.
+     */
+    protected void loadTweetsFromLastRun(@Observes @Priority(TweetRetrievalPriority.LOAD_TWEETS_FROM_LAST_RUNS) TweetRetrievalEvent event) {
+<span class="nc" id="L124">        log.info(&quot;Load tweets from the last run&quot;);</span>
+<span class="nc" id="L125">        event.setTweetsFromLastRun(twitterCache.get());</span>
+<span class="nc" id="L126">    }</span>
+
+
+    /**
+     * From the {@link TweetRetrievalEvent} parameter, get the list of
+     * new tweets Tweial found during this run and store those tweets so
+     * that the next time Tweial runs it knows to filter them out.
+     *
+     * @param event No validation performed on this parameter.
+     */
+    protected void saveNewTweetsFromThisRun(@Observes @Priority(TweetRetrievalPriority.SAVE_NEW_TWEETS_FROM_THIS_RUN) TweetRetrievalEvent event) {
+<span class="nc" id="L137">        log.info(&quot;Save tweets not in the last run&quot;);</span>
+<span class="nc" id="L138">        twitterCache.addAll(event.getNewTweetsFromThisRun());</span>
+<span class="nc" id="L139">    }</span>
+
+
+    /**
+     * Remove from Tweial's tweet store the tweets which are more than 7
+     * days old.  7 is hard coded and cannot be changed.
+     *
+     * @param event This parameter is not used.
+     */
+    protected void removeTweetsThatAreTooOld(@Observes @Priority(TweetRetrievalPriority.REMOVE_TWEETS_FROM_LAST_RUNS_THAT_ARE_TOO_OLD) TweetRetrievalEvent event) {
+<span class="nc" id="L149">        log.info(&quot;Remote tweets that are too old&quot;);</span>
+<span class="nc" id="L150">        twitterCache.vacuum(7);</span>
+<span class="nc" id="L151">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

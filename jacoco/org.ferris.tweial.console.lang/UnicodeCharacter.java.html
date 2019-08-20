@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>UnicodeCharacter.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.lang</a> &gt; <span class="el_source">UnicodeCharacter.java</span></div><h1>UnicodeCharacter.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.lang;
+
+import java.util.Arrays;
+import java.util.StringJoiner;
+
+/**
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+public class UnicodeCharacter {
+
+    private final char[] buff;
+    private final String string;
+    private final int utf32decimal;
+    private final String utf32hexstring;
+    private final String utf32unicodecode;
+    private final String[] utf16hexstrings;
+    private final String[] utf16unicodecodes;
+
+<span class="fc" id="L20">    public UnicodeCharacter(int utf_32_decimal_codepoint) {</span>
+<span class="fc" id="L21">        this.buff = Character.toChars(utf_32_decimal_codepoint);</span>
+<span class="fc" id="L22">        this.string = new String(buff);</span>
+<span class="fc" id="L23">        this.utf32decimal = utf_32_decimal_codepoint;</span>
+<span class="fc" id="L24">        this.utf32hexstring = Integer.toHexString(this.utf32decimal);</span>
+<span class="fc" id="L25">        this.utf32unicodecode = String.format(&quot;\\u%s&quot;,String.format(&quot;%s&quot;, String.format(&quot;%1$&quot; + 4 + &quot;s&quot;, this.utf32hexstring).replace(' ', '0')));</span>
+<span class="fc" id="L26">        this.utf16hexstrings = new String[this.buff.length]; {</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">            for(int i=0; i&lt;this.buff.length; i++) {</span>
+<span class="fc" id="L28">                this.utf16hexstrings[i] = Integer.toHexString((int)this.buff[i]);</span>
+            }
+        }
+<span class="fc" id="L31">        this.utf16unicodecodes = new String[this.buff.length]; {</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">            for(int i=0; i&lt;this.buff.length; i++) {</span>
+<span class="fc" id="L33">                this.utf16unicodecodes[i] = String.format(&quot;\\u%s&quot;,String.format(&quot;%s&quot;, String.format(&quot;%1$&quot; + 4 + &quot;s&quot;, this.utf16hexstrings[i]).replace(' ', '0')));</span>
+            }
+        }
+<span class="fc" id="L36">    }</span>
+
+    /**
+     * @return UTF-16 Unicode code representation of this Unicode character
+     */
+    public String[] toUTF16UnicodeCodes() {
+<span class="fc" id="L42">        return utf16unicodecodes;</span>
+    }
+
+    /**
+     * @return Attributes of this object
+     */
+    @Override
+    public String toString() {
+<span class="nc" id="L50">        StringJoiner sj = new StringJoiner(&quot;, &quot;, &quot;[UnicodeCharacter &quot;, &quot;]&quot;);</span>
+<span class="nc" id="L51">        sj.add(String.format(&quot;%-3s&quot;, getString()));</span>
+<span class="nc" id="L52">        sj.add(String.format(&quot;length=%d&quot;, getLength()));</span>
+<span class="nc" id="L53">        sj.add(String.format(&quot;codepoint=%d&quot;, getCodepoint()));</span>
+<span class="nc" id="L54">        sj.add(String.format(&quot;UTF32Decimal=%d&quot;, toUTF32Decimal()));</span>
+<span class="nc" id="L55">        sj.add(String.format(&quot;UTF32HexString=%s&quot;, toUTF32HexString()));</span>
+<span class="nc" id="L56">        sj.add(String.format(&quot;UTF32UnicodeCode=%s&quot;, toUTF32UnicodeCode()));</span>
+<span class="nc" id="L57">        sj.add(String.format(&quot;UTF16HexStrings=%s&quot;, Arrays.toString(toUTF16HexStrings())));</span>
+<span class="nc" id="L58">        sj.add(String.format(&quot;UTF16UnicodeCodes=%s&quot;, Arrays.toString(toUTF16UnicodeCodes())));</span>
+<span class="nc" id="L59">        return sj.toString();</span>
+    }
+
+    /**
+     * @return UTF-16 (hex) Strings representation of this Unicode character
+     */
+    public String[] toUTF16HexStrings() {
+<span class="fc" id="L66">        return utf16hexstrings;</span>
+    }
+
+    /**
+     * @return UTF-32 Unicode code representation of this Unicode character
+     */
+    public String toUTF32UnicodeCode() {
+<span class="fc" id="L73">        return utf32unicodecode;</span>
+    }
+
+    /**
+     * @return UTF-32 (hex) String representation of this Unicode character
+     */
+    public String toUTF32HexString() {
+<span class="fc" id="L80">        return utf32hexstring;</span>
+    }
+
+    /**
+     * @return UTF-32 (decimal) representation of this Unicode character
+     */
+    public int toUTF32Decimal() {
+<span class="fc" id="L87">        return utf32decimal;</span>
+    }
+
+    /**
+     * @return  Same as #toUTF32Decimal()
+     */
+    public int getCodepoint() {
+<span class="fc" id="L94">        return toUTF32Decimal();</span>
+    }
+
+    /**
+     * @return length of the char[]
+     */
+    public int getLength() {
+<span class="fc" id="L101">        return buff.length;</span>
+    }
+
+    /**
+     * @return the buffer
+     */
+    public char[] chars() {
+<span class="fc" id="L108">        return buff;</span>
+    }
+
+    /**
+     * @return {@link Character#charCount(int)}
+     */
+    public int charCount() {
+<span class="fc" id="L115">        return Character.charCount(getCodepoint());</span>
+    }
+
+    /**
+     * @return String representation of this Unicode character
+     */
+    public String getString() {
+<span class="fc" id="L122">        return this.string;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
