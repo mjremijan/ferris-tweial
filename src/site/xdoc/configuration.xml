@@ -18,7 +18,7 @@
 		
         <section name="JRE">
             <p>
-                Tweial requires Java 8. The Windows and Linux downloads come embedded
+                Tweial requires Java 8+. The Windows and Linux downloads come embedded
                 with a Java 8 JRE, so Tweial does not depend on the
                 system-level JRE to run.  
             </p>
