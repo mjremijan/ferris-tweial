@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.ferris</groupId>    
     <artifactId>ferris-tweial</artifactId>
-    <version>1.1.4.5-SNAPSHOT</version>
+    <version>1.1.4.5</version>
     <packaging>jar</packaging>
 
     <organization>
@@ -34,7 +33,8 @@
         <url>https://github.com/mjremijan/ferris-tweial</url>
         <connection>scm:git:git@github.com:mjremijan/ferris-tweial.git</connection>
         <developerConnection>scm:git:git@github.com:mjremijan/ferris-tweial.git</developerConnection>
-    </scm>
+      <tag>ferris-tweial-1.1.4.5</tag>
+  </scm>
 
     <developers>
         <developer>
@@ -43,7 +43,7 @@
             <id>mjremijan</id>
             <name>Michael Remijan</name>
             <organization>The Ferris Foundation</organization>			
-            <organizationUrl></organizationUrl>
+            <organizationUrl />
             <properties>
                 <twitter>@mjremijan</twitter>
                 <!-- picUrl></picUrl> Use this if no gravatar image -->
@@ -62,14 +62,14 @@
 		<contributor>
 			<email>ann.willmore@student.swic.edu</email>
 			<name>Ann L. Willmore</name>
-			<organization></organization>
-			<organizationUrl></organizationUrl>
-			<properties></properties>
+			<organization />
+			<organizationUrl />
+			<properties />
 			<roles>
 				<role>Logo designer</role>
 			</roles>
 			<timezone>America/Chicago</timezone>
-			<url></url>				
+			<url />				
 		</contributor>
 	</contributors>
 	 
@@ -186,7 +186,7 @@
                     -->
                     <execution>
                         <id>default-jar</id>
-                        <phase/>
+                        <phase />
                     </execution>
                     <!--
                      | Windows specific JAR
@@ -496,15 +496,15 @@
                                 <configuration>
                                     <target>
                                         <!-- Rename the ".resources" directory -->
-                                        <move file="target/site/jacoco/.resources" tofile="target/site/jacoco/resources"/>
+                                        <move file="target/site/jacoco/.resources" tofile="target/site/jacoco/resources" />
                                         <!-- Replace ".resources" in HTML files -->
                                         <replaceregexp flags="g">
-                                            <regexp pattern="\.resources"/>
-                                            <substitution expression="resources"/>
+                                            <regexp pattern="\.resources" />
+                                            <substitution expression="resources" />
                                             <fileset dir="target/site/jacoco">
-                                                <include name="**/*.html"/>
-                                                <include name="**/*.css"/>
-                                                <include name="**/*.js"/>
+                                                <include name="**/*.html" />
+                                                <include name="**/*.css" />
+                                                <include name="**/*.js" />
                                             </fileset>
                                         </replaceregexp>
                                     </target>
@@ -592,8 +592,7 @@
                                 <phase>verify</phase>
                                 <configuration>
                                     <target>
-                                        <unzip src="${project.build.directory}/${project.artifactId}-${project.version}-${ferrisWindowsAssemblyId}.zip"
-                                                                                       dest="${project.build.directory}/unziped" />
+                                        <unzip src="${project.build.directory}/${project.artifactId}-${project.version}-${ferrisWindowsAssemblyId}.zip" dest="${project.build.directory}/unziped" />
                                     </target>
                                 </configuration>
                                 <goals>
