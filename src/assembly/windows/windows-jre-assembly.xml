@@ -36,6 +36,15 @@
             <filtered>false</filtered>
             <lineEnding>windows</lineEnding>
         </fileSet>
+        <fileSet>
+            <directory>${ferrisLocalhostDevelopment}/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+            <filtered>false</filtered>
+            <lineEnding>windows</lineEnding>
+        </fileSet>
         
         <fileSet>
             <directory>target/site</directory>
