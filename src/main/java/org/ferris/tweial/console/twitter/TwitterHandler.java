@@ -10,6 +10,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidatorFactory;
 import org.apache.log4j.Logger;
 import org.ferris.tweial.console.preferences.PreferencesHandler;
+import org.ferris.tweial.console.retry.ExceptionRetry;
 import org.jboss.weld.experimental.Priority;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -87,6 +88,7 @@ public class TwitterHandler {
      * @param event This method responsible for calling
      * {@link TweetRetrievalEvent#setTweetsFromTwitter(java.util.List)}
      */
+    @ExceptionRetry
     protected void loadTweetsFromTwitter(@Observes @Priority(TweetRetrievalPriority.LOAD_TWEETS_FROM_TWITTER) TweetRetrievalEvent event) {
         log.info("Load the Twitter home timeline");
 
