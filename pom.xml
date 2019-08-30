@@ -56,21 +56,6 @@
             <url>http://www.linkedin.com/in/mjremijan</url>
         </developer>
     </developers>
-	
-	<contributors>
-		<contributor>
-			<email>ann.willmore@student.swic.edu</email>
-			<name>Ann L. Willmore</name>
-			<organization />
-			<organizationUrl />
-			<properties />
-			<roles>
-				<role>Logo designer</role>
-			</roles>
-			<timezone>America/Chicago</timezone>
-			<url />				
-		</contributor>
-	</contributors>
 	 
 	<properties>
         <maven.compiler.source>1.8</maven.compiler.source>
