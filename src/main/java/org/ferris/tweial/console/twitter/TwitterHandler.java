@@ -90,7 +90,7 @@ public class TwitterHandler {
      */
     @ExceptionRetry
     protected void loadTweetsFromTwitter(@Observes @Priority(TweetRetrievalPriority.LOAD_TWEETS_FROM_TWITTER) TweetRetrievalEvent event) {
-        log.info("Load the Twitter home timeline");
+        log.info("Attempt to load the Twitter home timeline");
 
         Twitter twitter = twitterBuilder
             .setAccount(getTwitterAccount())
