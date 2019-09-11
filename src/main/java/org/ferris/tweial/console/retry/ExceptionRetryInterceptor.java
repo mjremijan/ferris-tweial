@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 public class ExceptionRetryInterceptor implements Serializable {
 
     private static final long serialVersionUID = 76675643567899788L;
+    private static final int max = 4;
 
     @Inject
     protected Logger log;
@@ -23,12 +24,17 @@ public class ExceptionRetryInterceptor implements Serializable {
     @AroundInvoke
      public Object retryIfExceptionCaught(InvocationContext ctx) throws Exception {
          Exception caught = null;
-         for (int i=1, imax=4; i<=imax; i++) {
+         for (int i=1, imax=max; i<=imax; i++) {
              try {
                  return ctx.proceed();
              } catch (Exception e) {
                  caught = e;
-                 log.warn(String.format("Exception caught on attempt %d of %d", i, imax), e);
+                 String msg = String.format("Exception caught on attempt %d of %d", i, imax);
+                 if (i == max) {
+                    log.warn(msg, e);
+                 } else {
+                    log.warn(msg);
+                 }
              }
              try {
                  Thread.sleep(1000 * 5);
