@@ -90,8 +90,11 @@
                                     <a href="http://www.twitter.com/${tweet.user.screenName}/status/${tweet.id}"><img style="border:0px solid blueviolet; vertical-align: bottom;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAOCAYAAAA1+Nx+AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3wwIEysgfIYBPAAAAFBJREFUOMtjYBgFAw0YYYyZM2eGMTAwtEC5Nenp6auQFZIrz4gkuRLN8nCYIkrkmaCcFiy+a8HBJkmeidZxALOgBotcDQ42SfI0j+RRMPAAAI7qMwr29p9JAAAAAElFTkSuQmCC" alt="More Image"/></a>
                                 </div>
                                
-                                asdfadf
-                                
+                                <div style="border: 0px solid blue; padding-top: 5px; clear:both;">
+                                    <#list tweet.nonPhotoMedia as nonPhotoMediaMetadata>
+                                        <p style="font-size:x-small">${nonPhotoMediaMetadata}</p>
+                                    </#list>
+                                </div>
                                 
                             </div>
                         </div>
