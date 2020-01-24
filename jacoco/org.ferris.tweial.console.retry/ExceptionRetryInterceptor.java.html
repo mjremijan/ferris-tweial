@@ -16,25 +16,31 @@ import org.apache.log4j.Logger;
 <span class="nc" id="L16">public class ExceptionRetryInterceptor implements Serializable {</span>
 
     private static final long serialVersionUID = 76675643567899788L;
+    private static final int max = 4;
 
     @Inject
     protected Logger log;
 
     @AroundInvoke
      public Object retryIfExceptionCaught(InvocationContext ctx) throws Exception {
-<span class="nc" id="L25">         Exception caught = null;</span>
-<span class="nc bnc" id="L26" title="All 2 branches missed.">         for (int i=1, imax=4; i&lt;=imax; i++) {</span>
+<span class="nc" id="L26">         Exception caught = null;</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">         for (int i=1, imax=max; i&lt;=imax; i++) {</span>
              try {
-<span class="nc" id="L28">                 return ctx.proceed();</span>
-<span class="nc" id="L29">             } catch (Exception e) {</span>
-<span class="nc" id="L30">                 caught = e;</span>
-<span class="nc" id="L31">                 log.warn(String.format(&quot;Exception caught on attempt %d of %d&quot;, i, imax), e);</span>
+<span class="nc" id="L29">                 return ctx.proceed();</span>
+<span class="nc" id="L30">             } catch (Exception e) {</span>
+<span class="nc" id="L31">                 caught = e;</span>
+<span class="nc" id="L32">                 String msg = String.format(&quot;Exception caught on attempt %d of %d&quot;, i, imax);</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                 if (i == max) {</span>
+<span class="nc" id="L34">                    log.warn(msg, e);</span>
+                 } else {
+<span class="nc" id="L36">                    log.warn(msg);</span>
+                 }
              }
              try {
-<span class="nc" id="L34">                 Thread.sleep(1000 * 5);</span>
-<span class="nc" id="L35">             } catch (InterruptedException e) {}</span>
+<span class="nc" id="L40">                 Thread.sleep(1000 * 5);</span>
+<span class="nc" id="L41">             } catch (InterruptedException e) {}</span>
          }
-<span class="nc" id="L37">         throw caught;</span>
+<span class="nc" id="L43">         throw caught;</span>
      }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

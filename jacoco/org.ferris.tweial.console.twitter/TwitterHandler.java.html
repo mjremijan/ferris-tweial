@@ -10,6 +10,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidatorFactory;
 import org.apache.log4j.Logger;
 import org.ferris.tweial.console.preferences.PreferencesHandler;
+import org.ferris.tweial.console.retry.ExceptionRetry;
 import org.jboss.weld.experimental.Priority;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -19,7 +20,7 @@ import twitter4j.Twitter;
  *
  * @author Michael Remijan mjremijan@yahoo.com @mjremijan
  */
-<span class="nc" id="L22">public class TwitterHandler {</span>
+<span class="nc" id="L23">public class TwitterHandler {</span>
 
     @Inject
     protected Logger log;
@@ -48,8 +49,8 @@ import twitter4j.Twitter;
      * properties set to null.
      */
     public TwitterAccount getTwitterAccount() {
-<span class="nc" id="L51">        log.info(&quot;Create TwitterAccount from properties&quot;);</span>
-<span class="nc" id="L52">        return new TwitterAccount(twitterProperties.toProperties());</span>
+<span class="nc" id="L52">        log.info(&quot;Create TwitterAccount from properties&quot;);</span>
+<span class="nc" id="L53">        return new TwitterAccount(twitterProperties.toProperties());</span>
     }
 
     /**
@@ -61,10 +62,10 @@ import twitter4j.Twitter;
      * @return Returns constraint violations or an empty set if none.
      */
     public Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; validate(TwitterAccount validateMe) {
-<span class="nc" id="L64">        log.info(&quot;Validate the TwitterAccount object&quot;);</span>
-<span class="nc" id="L65">        Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; violations</span>
-<span class="nc" id="L66">                = validatorFactory.getValidator().validate(validateMe);</span>
-<span class="nc" id="L67">        return violations;</span>
+<span class="nc" id="L65">        log.info(&quot;Validate the TwitterAccount object&quot;);</span>
+<span class="nc" id="L66">        Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; violations</span>
+<span class="nc" id="L67">                = validatorFactory.getValidator().validate(validateMe);</span>
+<span class="nc" id="L68">        return violations;</span>
     }
 
     /**
@@ -75,10 +76,10 @@ import twitter4j.Twitter;
      * @return A {@link TwitterDataSource}.
      */
     public TwitterDataSource getTwitterDataSource() {
-<span class="nc" id="L78">        log.info(&quot;Get the Twitter data source&quot;);</span>
-<span class="nc" id="L79">        String desc = twitterProperties.getAbsolutePath();</span>
-<span class="nc" id="L80">        boolean exists = twitterProperties.exists();</span>
-<span class="nc" id="L81">        return new TwitterDataSource(desc, exists);</span>
+<span class="nc" id="L79">        log.info(&quot;Get the Twitter data source&quot;);</span>
+<span class="nc" id="L80">        String desc = twitterProperties.getAbsolutePath();</span>
+<span class="nc" id="L81">        boolean exists = twitterProperties.exists();</span>
+<span class="nc" id="L82">        return new TwitterDataSource(desc, exists);</span>
     }
 
     /**
@@ -87,31 +88,32 @@ import twitter4j.Twitter;
      * @param event This method responsible for calling
      * {@link TweetRetrievalEvent#setTweetsFromTwitter(java.util.List)}
      */
+    @ExceptionRetry
     protected void loadTweetsFromTwitter(@Observes @Priority(TweetRetrievalPriority.LOAD_TWEETS_FROM_TWITTER) TweetRetrievalEvent event) {
-<span class="nc" id="L91">        log.info(&quot;Load the Twitter home timeline&quot;);</span>
+<span class="nc" id="L93">        log.info(&quot;Attempt to load the Twitter home timeline&quot;);</span>
 
-<span class="nc" id="L93">        Twitter twitter = twitterBuilder</span>
-<span class="nc" id="L94">            .setAccount(getTwitterAccount())</span>
-<span class="nc" id="L95">            .build();</span>
+<span class="nc" id="L95">        Twitter twitter = twitterBuilder</span>
+<span class="nc" id="L96">            .setAccount(getTwitterAccount())</span>
+<span class="nc" id="L97">            .build();</span>
 
-<span class="nc" id="L97">        List&lt;Status&gt; retval = null;</span>
+<span class="nc" id="L99">        List&lt;Status&gt; retval = null;</span>
         try {
-<span class="nc" id="L99">            Long id = preferencesHandler.findPreferences().getGetOnlyThisTweetId();</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (id == -1) {</span>
-<span class="nc" id="L101">                retval = twitter.getHomeTimeline();</span>
+<span class="nc" id="L101">            Long id = preferencesHandler.findPreferences().getGetOnlyThisTweetId();</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            if (id == -1) {</span>
+<span class="nc" id="L103">                retval = twitter.getHomeTimeline();</span>
             } else {
-<span class="nc" id="L103">                retval = new LinkedList&lt;&gt;();</span>
-<span class="nc" id="L104">                Collections.addAll(retval, twitter.showStatus(id));</span>
+<span class="nc" id="L105">                retval = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L106">                Collections.addAll(retval, twitter.showStatus(id));</span>
             }
-<span class="nc" id="L106">        } catch (Exception e) {</span>
-<span class="nc" id="L107">            throw new RuntimeException(&quot;Failure getting Twitter home timeline&quot;, e);</span>
-<span class="nc" id="L108">        }</span>
-<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (retval == null) {</span>
-<span class="nc" id="L110">            retval = Collections.emptyList();</span>
+<span class="nc" id="L108">        } catch (Exception e) {</span>
+<span class="nc" id="L109">            throw new RuntimeException(&quot;Failure getting Twitter home timeline&quot;, e);</span>
+<span class="nc" id="L110">        }</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (retval == null) {</span>
+<span class="nc" id="L112">            retval = Collections.emptyList();</span>
         }
 
-<span class="nc" id="L113">        event.setTweetsFromTwitter(retval);</span>
-<span class="nc" id="L114">    }</span>
+<span class="nc" id="L115">        event.setTweetsFromTwitter(retval);</span>
+<span class="nc" id="L116">    }</span>
 
 
     /**
@@ -121,9 +123,9 @@ import twitter4j.Twitter;
      * @param event No validation performed on this parameter.
      */
     protected void loadTweetsFromLastRun(@Observes @Priority(TweetRetrievalPriority.LOAD_TWEETS_FROM_LAST_RUNS) TweetRetrievalEvent event) {
-<span class="nc" id="L124">        log.info(&quot;Load tweets from the last run&quot;);</span>
-<span class="nc" id="L125">        event.setTweetsFromLastRun(twitterCache.get());</span>
-<span class="nc" id="L126">    }</span>
+<span class="nc" id="L126">        log.info(&quot;Load tweets from the last run&quot;);</span>
+<span class="nc" id="L127">        event.setTweetsFromLastRun(twitterCache.get());</span>
+<span class="nc" id="L128">    }</span>
 
 
     /**
@@ -134,9 +136,9 @@ import twitter4j.Twitter;
      * @param event No validation performed on this parameter.
      */
     protected void saveNewTweetsFromThisRun(@Observes @Priority(TweetRetrievalPriority.SAVE_NEW_TWEETS_FROM_THIS_RUN) TweetRetrievalEvent event) {
-<span class="nc" id="L137">        log.info(&quot;Save tweets not in the last run&quot;);</span>
-<span class="nc" id="L138">        twitterCache.addAll(event.getNewTweetsFromThisRun());</span>
-<span class="nc" id="L139">    }</span>
+<span class="nc" id="L139">        log.info(&quot;Save tweets not in the last run&quot;);</span>
+<span class="nc" id="L140">        twitterCache.addAll(event.getNewTweetsFromThisRun());</span>
+<span class="nc" id="L141">    }</span>
 
 
     /**
@@ -146,8 +148,8 @@ import twitter4j.Twitter;
      * @param event This parameter is not used.
      */
     protected void removeTweetsThatAreTooOld(@Observes @Priority(TweetRetrievalPriority.REMOVE_TWEETS_FROM_LAST_RUNS_THAT_ARE_TOO_OLD) TweetRetrievalEvent event) {
-<span class="nc" id="L149">        log.info(&quot;Remote tweets that are too old&quot;);</span>
-<span class="nc" id="L150">        twitterCache.vacuum(7);</span>
-<span class="nc" id="L151">    }</span>
+<span class="nc" id="L151">        log.info(&quot;Remote tweets that are too old&quot;);</span>
+<span class="nc" id="L152">        twitterCache.vacuum(7);</span>
+<span class="nc" id="L153">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
