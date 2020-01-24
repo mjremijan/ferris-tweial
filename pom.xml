@@ -4,7 +4,7 @@
 
     <groupId>org.ferris</groupId>    
     <artifactId>ferris-tweial</artifactId>
-    <version>1.1.5.0-SNAPSHOT</version>
+    <version>1.1.5.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <organization>
@@ -33,8 +33,7 @@
         <url>https://github.com/mjremijan/ferris-tweial</url>
         <connection>scm:git:git@github.com:mjremijan/ferris-tweial.git</connection>
         <developerConnection>scm:git:git@github.com:mjremijan/ferris-tweial.git</developerConnection>
-      <tag>ferris-tweial-1.1.4.5</tag>
-  </scm>
+    </scm>
 
     <developers>
         <developer>
@@ -57,21 +56,6 @@
             <url>http://www.linkedin.com/in/mjremijan</url>
         </developer>
     </developers>
-	
-	<contributors>
-		<contributor>
-			<email>ann.willmore@student.swic.edu</email>
-			<name>Ann L. Willmore</name>
-			<organization />
-			<organizationUrl />
-			<properties />
-			<roles>
-				<role>Logo designer</role>
-			</roles>
-			<timezone>America/Chicago</timezone>
-			<url />				
-		</contributor>
-	</contributors>
 	 
 	<properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -83,6 +67,7 @@
         <ferrisJacocoVersion>0.7.5.201505241946</ferrisJacocoVersion>
         <ferrisWindowsAssemblyId>windows-x86-64-jre</ferrisWindowsAssemblyId>
         <ferrisLinuxAssemblyId>linux-x86-64-jre</ferrisLinuxAssemblyId>
+        <ferrisLocalhostDevelopment>D:/Documents/Development/tweial</ferrisLocalhostDevelopment>
     </properties>
 
     <dependencyManagement>
@@ -130,7 +115,13 @@
                     <exclude>ApplicationMessages.properties</exclude>
                 </excludes>
                 <filtering>false</filtering>
-            </resource>            
+            </resource> 
+            <resource>
+                <directory>${ferrisLocalhostDevelopment}/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>                       
         </resources>
         <plugins>
             <!--
