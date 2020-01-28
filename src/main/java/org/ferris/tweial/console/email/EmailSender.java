@@ -107,6 +107,7 @@ public class EmailSender {
             // reply
             {
                 InternetAddress reply = new InternetAddress(emailAccount.getEmailAddress());
+                reply.setPersonal("Tweial");
                 m.setReplyTo(new InternetAddress[] {reply});
             }
 
