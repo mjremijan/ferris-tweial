@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -16,15 +17,15 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import org.apache.log4j.Logger;
-import org.ferris.tweial.console.retry.ExceptionRetry;
 import org.ferris.tweial.console.log4j.Log4jRollingFileAppender;
+import org.ferris.tweial.console.retry.ExceptionRetry;
 import org.jboss.weld.experimental.Priority;
 
 /**
  *
  * @author Michael Remijan mjremijan@yahoo.com @mjremijan
  */
-<span class="nc" id="L27">public class EmailSender {</span>
+<span class="nc" id="L28">public class EmailSender {</span>
 
     @Inject
     protected Logger log;
@@ -40,81 +41,92 @@ import org.jboss.weld.experimental.Priority;
         EmailSendEvent evnt
     ) throws MessagingException, IOException {
 
-<span class="nc bnc" id="L43" title="All 4 branches missed.">        if (evnt.getSubject().isEmpty() || evnt.getMessage().isEmpty()) {</span>
-<span class="nc" id="L44">            return;</span>
+<span class="nc bnc" id="L44" title="All 4 branches missed.">        if (evnt.getSubject().isEmpty() || evnt.getMessage().isEmpty()) {</span>
+<span class="nc" id="L45">            return;</span>
         }
 
         // Create MimeMultipart
-<span class="nc" id="L48">        MimeMultipart content = new MimeMultipart(&quot;related&quot;);</span>
+<span class="nc" id="L49">        MimeMultipart content = new MimeMultipart(&quot;related&quot;);</span>
 
         // html part
         {
-<span class="nc" id="L52">            MimeBodyPart textPart = new MimeBodyPart();</span>
-<span class="nc" id="L53">            textPart.setText(evnt.getMessage(), &quot;UTF8&quot;, &quot;html&quot;);</span>
-<span class="nc" id="L54">            content.addBodyPart(textPart);</span>
+<span class="nc" id="L53">            MimeBodyPart textPart = new MimeBodyPart();</span>
+<span class="nc" id="L54">            textPart.setText(evnt.getMessage(), &quot;UTF8&quot;, &quot;html&quot;);</span>
+<span class="nc" id="L55">            content.addBodyPart(textPart);</span>
         }
 
-//        // image part
-//        {
-//            MimeBodyPart imagePart = new MimeBodyPart();
-//            ByteArrayDataSource ds =
-//                new ByteArrayDataSource(getClass().getResourceAsStream(&quot;/retweet.png&quot;), &quot;image/png&quot;);
-//            imagePart.setDataHandler(new DataHandler(ds));
-//            imagePart.setFileName(&quot;retweet.png&quot;);
-//            imagePart.setContentID(&quot;&lt;&quot; + evnt.getCid() + &quot;&gt;&quot;);
-//            imagePart.setDisposition(MimeBodyPart.INLINE);
-//
-//            content.addBodyPart(imagePart);
-//        }
 
-<span class="nc" id="L70">        Session smtp = null;</span>
-<span class="nc" id="L71">        EmailAccount emailAccount = emailHandler.getEmailAccount();</span>
+        // properties
+<span class="nc" id="L60">        EmailAccount emailAccount = emailHandler.getEmailAccount();</span>
+<span class="nc" id="L61">        Properties props = new Properties();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (emailAccount.isSslEnabled()) {</span>
+<span class="nc" id="L63">            props.setProperty(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L64">            props.setProperty(&quot;mail.smtp.host&quot;, emailAccount.getHost());</span>
+<span class="nc" id="L65">            props.setProperty(&quot;mail.smtp.socketFactory.port&quot;, emailAccount.getPort().toString());</span>
+<span class="nc" id="L66">            props.setProperty(&quot;mail.smtp.socketFactory.class&quot;, &quot;javax.net.ssl.SSLSocketFactory&quot;);</span>
+        } else {
+<span class="nc" id="L68">            props.setProperty(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L69">            props.setProperty(&quot;mail.smtp.host&quot;, emailAccount.getHost());</span>
+<span class="nc" id="L70">            props.setProperty(&quot;mail.smtp.port&quot;, emailAccount.getPort().toString());</span>
+<span class="nc" id="L71">            props.setProperty(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+        }
+
+<span class="nc" id="L74">        Session smtp = null;</span>
         {
-<span class="nc" id="L73">            Properties props = new Properties();</span>
-<span class="nc" id="L74">            props = new Properties();</span>
-<span class="nc" id="L75">            props.setProperty(&quot;mail.smtp.host&quot;, emailAccount.getHost());</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (emailAccount.isSslEnabled()) {</span>
-<span class="nc" id="L77">                props.setProperty(&quot;mail.smtp.socketFactory.port&quot;, emailAccount.getPort().toString());</span>
-<span class="nc" id="L78">                props.setProperty(&quot;mail.smtp.socketFactory.class&quot;, &quot;javax.net.ssl.SSLSocketFactory&quot;);</span>
-            } else {
-<span class="nc" id="L80">                props.setProperty(&quot;mail.smtp.socketFactory.port&quot;, emailAccount.getPort().toString());</span>
-<span class="nc" id="L81">                props.setProperty(&quot;mail.smtp.socketFactory.class&quot;, &quot;javax.net.SocketFactory&quot;);</span>
-            }
-<span class="nc" id="L83">            props.setProperty(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
-<span class="nc" id="L84">            props.setProperty(&quot;mail.smtp.port&quot;, emailAccount.getPort().toString());</span>
-
-<span class="nc" id="L86">            smtp = Session.getDefaultInstance(props, new javax.mail.Authenticator() {</span>
+<span class="nc" id="L76">            smtp = Session.getInstance(props, new Authenticator() {</span>
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-<span class="nc" id="L89">                    return new PasswordAuthentication(emailAccount.getUsername(), emailAccount.getPassword());</span>
+<span class="nc" id="L79">                    return new PasswordAuthentication(</span>
+<span class="nc" id="L80">                          emailAccount.getUsername()</span>
+<span class="nc" id="L81">                        , emailAccount.getPassword()</span>
+                    );
                 }
             });
+<span class="nc" id="L85">            smtp.setDebug(true);</span>
+<span class="nc" id="L86">            smtp.setDebugOut(getPrintStream());</span>
         }
-<span class="nc" id="L93">        smtp.setDebug(true);</span>
-<span class="nc" id="L94">        smtp.setDebugOut(getPrintStream());</span>
 
-<span class="nc" id="L96">        MimeMessage m = new MimeMessage(smtp);</span>
-<span class="nc" id="L97">        m.setContent(content);</span>
-<span class="nc" id="L98">        m.setSubject(evnt.getSubject());</span>
-<span class="nc" id="L99">        m.setRecipient(Message.RecipientType.TO, new InternetAddress(emailAccount.getSendToAddress()));</span>
-<span class="nc" id="L100">        m.setReplyTo(new InternetAddress[] {new InternetAddress(emailAccount.getEmailAddress())});</span>
-<span class="nc" id="L101">        InternetAddress ia = new InternetAddress(emailAccount.getEmailAddress());</span>
-<span class="nc" id="L102">        ia.setPersonal(&quot;Tweial&quot;);</span>
-<span class="nc" id="L103">        m.setFrom(ia);</span>
+<span class="nc" id="L89">        MimeMessage m = new MimeMessage(smtp);</span>
+        {
+            // to
+<span class="nc" id="L92">            m.setRecipient(</span>
+                  Message.RecipientType.TO
+<span class="nc" id="L94">                , new InternetAddress(emailAccount.getSendToAddress())</span>
+            );
 
-<span class="nc" id="L105">        log.info(String.format(&quot;Attempt email with %s&quot;, emailAccount.toString()));</span>
-<span class="nc" id="L106">        Transport.send(m);</span>
-<span class="nc" id="L107">    }</span>
+            // subject
+<span class="nc" id="L98">            m.setSubject(evnt.getSubject());</span>
+
+            // from
+            {
+<span class="nc" id="L102">                InternetAddress from = new InternetAddress(emailAccount.getEmailAddress());</span>
+<span class="nc" id="L103">                from.setPersonal(&quot;Tweial&quot;);</span>
+<span class="nc" id="L104">                m.setFrom(from);</span>
+            }
+
+            // reply
+            {
+<span class="nc" id="L109">                InternetAddress reply = new InternetAddress(emailAccount.getEmailAddress());</span>
+<span class="nc" id="L110">                reply.setPersonal(&quot;Tweial&quot;);</span>
+<span class="nc" id="L111">                m.setReplyTo(new InternetAddress[] {reply});</span>
+            }
+
+<span class="nc" id="L114">            m.setContent(content);</span>
+        }
+
+<span class="nc" id="L117">        log.info(String.format(&quot;Attempt email with %s&quot;, emailAccount.toString()));</span>
+<span class="nc" id="L118">        Transport.send(m);</span>
+<span class="nc" id="L119">    }</span>
 
     protected PrintStream getPrintStream() {
-<span class="nc" id="L110">        Enumeration enu = log.getAllAppenders();</span>
-<span class="nc bnc" id="L111" title="All 2 branches missed.">        while (enu.hasMoreElements()) {</span>
-<span class="nc" id="L112">            Object o = enu.nextElement();</span>
-<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (o instanceof Log4jRollingFileAppender) {</span>
-<span class="nc" id="L114">                return ((Log4jRollingFileAppender)o).getPrintStream();</span>
+<span class="nc" id="L122">        Enumeration enu = log.getAllAppenders();</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        while (enu.hasMoreElements()) {</span>
+<span class="nc" id="L124">            Object o = enu.nextElement();</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (o instanceof Log4jRollingFileAppender) {</span>
+<span class="nc" id="L126">                return ((Log4jRollingFileAppender)o).getPrintStream();</span>
             }
-<span class="nc" id="L116">        }</span>
-<span class="nc" id="L117">        return System.out;</span>
+<span class="nc" id="L128">        }</span>
+<span class="nc" id="L129">        return System.out;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

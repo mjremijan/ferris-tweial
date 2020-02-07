@@ -24,7 +24,7 @@ ferris-tweial,org.ferris.tweial.console.retry,ExceptionRetryInterceptor,54,0,4,0
 ferris-tweial,org.ferris.tweial.console.data,DataDirectory,21,0,2,0,5,0,2,0,1,0
 ferris-tweial,org.ferris.tweial.console.data,DataDirectoryProducer,14,0,0,0,4,0,3,0,3,0
 ferris-tweial,org.ferris.tweial.console.view.page,AbstractPage,0,3,0,0,0,1,0,1,0,1
-ferris-tweial,org.ferris.tweial.console.email,EmailSender.new Authenticator() {...},19,0,0,0,2,0,2,0,2,0
+ferris-tweial,org.ferris.tweial.console.email,EmailSender.new Authenticator() {...},19,0,0,0,4,0,2,0,2,0
 ferris-tweial,org.ferris.tweial.console.email,EmailStartupObserver,0,53,2,2,0,14,2,3,0,3
 ferris-tweial,org.ferris.tweial.console.email,EmailRendererByFreeMarker,48,147,2,0,15,37,2,5,1,5
 ferris-tweial,org.ferris.tweial.console.email,EmailTweetBuilder,22,349,6,40,4,57,8,24,2,7
@@ -33,7 +33,7 @@ ferris-tweial,org.ferris.tweial.console.email,EmailPropertiesFile,0,5,0,0,0,2,0,
 ferris-tweial,org.ferris.tweial.console.email,EmailTweet,0,34,0,2,0,10,0,11,0,10
 ferris-tweial,org.ferris.tweial.console.email,EmailPage,19,45,0,0,4,10,1,3,1,3
 ferris-tweial,org.ferris.tweial.console.email,EmailHandler,0,38,0,0,0,9,0,4,0,4
-ferris-tweial,org.ferris.tweial.console.email,EmailSender,185,0,10,0,40,0,8,0,3,0
+ferris-tweial,org.ferris.tweial.console.email,EmailSender,190,0,10,0,43,0,8,0,3,0
 ferris-tweial,org.ferris.tweial.console.email,EmailSendEvent,18,6,0,0,7,3,5,1,5,1
 ferris-tweial,org.ferris.tweial.console.email,EmailSendPriority,3,0,0,0,1,0,1,0,1,0
 ferris-tweial,org.ferris.tweial.console.email,EmailAccount,6,126,0,8,2,40,2,18,2,14
