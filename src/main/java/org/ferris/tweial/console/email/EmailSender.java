@@ -6,6 +6,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -16,8 +17,8 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import org.apache.log4j.Logger;
-import org.ferris.tweial.console.retry.ExceptionRetry;
 import org.ferris.tweial.console.log4j.Log4jRollingFileAppender;
+import org.ferris.tweial.console.retry.ExceptionRetry;
 import org.jboss.weld.experimental.Priority;
 
 /**
@@ -54,53 +55,64 @@ public class EmailSender {
             content.addBodyPart(textPart);
         }
 
-//        // image part
-//        {
-//            MimeBodyPart imagePart = new MimeBodyPart();
-//            ByteArrayDataSource ds =
-//                new ByteArrayDataSource(getClass().getResourceAsStream("/retweet.png"), "image/png");
-//            imagePart.setDataHandler(new DataHandler(ds));
-//            imagePart.setFileName("retweet.png");
-//            imagePart.setContentID("<" + evnt.getCid() + ">");
-//            imagePart.setDisposition(MimeBodyPart.INLINE);
-//
-//            content.addBodyPart(imagePart);
-//        }
+
+        // properties
+        EmailAccount emailAccount = emailHandler.getEmailAccount();
+        Properties props = new Properties();
+        if (emailAccount.isSslEnabled()) {
+            props.setProperty("mail.smtp.auth", "true");
+            props.setProperty("mail.smtp.host", emailAccount.getHost());
+            props.setProperty("mail.smtp.socketFactory.port", emailAccount.getPort().toString());
+            props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        } else {
+            props.setProperty("mail.smtp.auth", "true");
+            props.setProperty("mail.smtp.host", emailAccount.getHost());
+            props.setProperty("mail.smtp.port", emailAccount.getPort().toString());
+            props.setProperty("mail.smtp.starttls.enable", "true");
+        }
 
         Session smtp = null;
-        EmailAccount emailAccount = emailHandler.getEmailAccount();
         {
-            Properties props = new Properties();
-            props = new Properties();
-            props.setProperty("mail.smtp.host", emailAccount.getHost());
-            if (emailAccount.isSslEnabled()) {
-                props.setProperty("mail.smtp.socketFactory.port", emailAccount.getPort().toString());
-                props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            } else {
-                props.setProperty("mail.smtp.socketFactory.port", emailAccount.getPort().toString());
-                props.setProperty("mail.smtp.socketFactory.class", "javax.net.SocketFactory");
-            }
-            props.setProperty("mail.smtp.auth", "true");
-            props.setProperty("mail.smtp.port", emailAccount.getPort().toString());
-
-            smtp = Session.getDefaultInstance(props, new javax.mail.Authenticator() {
+            smtp = Session.getInstance(props, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(emailAccount.getUsername(), emailAccount.getPassword());
+                    return new PasswordAuthentication(
+                          emailAccount.getUsername()
+                        , emailAccount.getPassword()
+                    );
                 }
             });
+            smtp.setDebug(true);
+            smtp.setDebugOut(getPrintStream());
         }
-        smtp.setDebug(true);
-        smtp.setDebugOut(getPrintStream());
 
         MimeMessage m = new MimeMessage(smtp);
-        m.setContent(content);
-        m.setSubject(evnt.getSubject());
-        m.setRecipient(Message.RecipientType.TO, new InternetAddress(emailAccount.getSendToAddress()));
-        m.setReplyTo(new InternetAddress[] {new InternetAddress(emailAccount.getEmailAddress())});
-        InternetAddress ia = new InternetAddress(emailAccount.getEmailAddress());
-        ia.setPersonal("Tweial");
-        m.setFrom(ia);
+        {
+            // to
+            m.setRecipient(
+                  Message.RecipientType.TO
+                , new InternetAddress(emailAccount.getSendToAddress())
+            );
+
+            // subject
+            m.setSubject(evnt.getSubject());
+
+            // from
+            {
+                InternetAddress from = new InternetAddress(emailAccount.getEmailAddress());
+                from.setPersonal("Tweial");
+                m.setFrom(from);
+            }
+
+            // reply
+            {
+                InternetAddress reply = new InternetAddress(emailAccount.getEmailAddress());
+                reply.setPersonal("Tweial");
+                m.setReplyTo(new InternetAddress[] {reply});
+            }
+
+            m.setContent(content);
+        }
 
         log.info(String.format("Attempt email with %s", emailAccount.toString()));
         Transport.send(m);

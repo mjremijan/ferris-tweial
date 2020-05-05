@@ -31,9 +31,9 @@
                                     </div>
                                 </#if>
                                 <div style="border: 0px solid blue; padding-top: 5px; clear:both; font-size: smaller;">
-                                    <p id="tweialtweetfromname" style="font-weight: bold; margin:0px;">${tweet.user.name}</p>
+                                    <p id="tweialtweetfromname" style="font-size:medium; font-weight: bold; margin:0px;">${tweet.user.name}</p>
                                     <p id="tweialtweetfromid" style="color: grey; margin:0px;">@${tweet.user.screenName}</p>
-                                    <p id="tweialtweettime" style="color:grey; margin:2px 0px 0px 0px;">${tweet.createdAt}</p>                                  
+                                    <p id="tweialtweettime" style="color:grey; margin:0px;">${tweet.createdAt}</p>                                  
                                 </div>
                             </div>
                             <div style="float:left; border: 0px solid red; padding-top:5px; padding-left:2px; width:400px; clear:both;">
@@ -56,7 +56,7 @@
                                 </#list>
                                 <#if (tweet.quotedTweet)??>
                                     <div style="border: 1px solid grey; padding: 5px; margin-top: 5px;">
-                                        <div id="tweialquotetweetfromname" style="float:left; font-weight: bold;">${tweet.quotedTweet.user.name}</div>
+                                        <div id="tweialquotetweetfromname" style="font-size:medium; float:left; font-weight: bold;">${tweet.quotedTweet.user.name}</div>
                                         <div id="tweialquotetweetfromid" style="float:left; color: grey; padding-left: 10px;">@${tweet.quotedTweet.user.screenName}</div>
                                         <div id="tweialquotetweettext" style="clear:both; color:rgb(40%, 40%, 40%); ">
                                             ${tweet.quotedTweet.text}
