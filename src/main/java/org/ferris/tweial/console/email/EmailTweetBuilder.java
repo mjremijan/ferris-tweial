@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import javax.inject.Inject;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.ferris.tweial.console.lang.StringDecorator;
 import org.ferris.tweial.console.preferences.PreferencesHandler;
@@ -117,23 +118,38 @@ public class EmailTweetBuilder {
             }
 
             // Media photos
-            t.photoUrls = new LinkedList<>();
+            t.photoUrls = new LinkedList<>(); {
             MediaEntity[] mediaEntities = s.getMediaEntities();
-            if (mediaEntities != null && mediaEntities.length >= 1) {
-                for (MediaEntity entity : mediaEntities) {
-                    if ("photo".equalsIgnoreCase(entity.getType())) {
-                        // URL of photo in tweet (possibly)
-                        urlsToRemoveFromTweetText.add(entity.getURL());
-                        // URL of photo
-                        if (entity.getMediaURLHttps() != null && !entity.getMediaURLHttps().isEmpty()) {
-                            t.photoUrls.add(entity.getMediaURLHttps());
+                if (mediaEntities != null && mediaEntities.length >= 1) {
+                    for (MediaEntity entity : mediaEntities) {
+                        if ("photo".equalsIgnoreCase(entity.getType())) {
+                            // URL of photo in tweet (possibly)
+                            urlsToRemoveFromTweetText.add(entity.getURL());
+                            // URL of photo
+                            if (entity.getMediaURLHttps() != null && !entity.getMediaURLHttps().isEmpty()) {
+                                t.photoUrls.add(entity.getMediaURLHttps());
+                            }
+                            else
+                            if (entity.getMediaURL() != null && !entity.getMediaURL().isEmpty()) {
+                                t.photoUrls.add(entity.getMediaURL());
+                            }
+                            else {
+                                t.photoUrls.add(preferencesHandler.findPreferences().getNoImageUrl());
+                            }
                         }
-                        else
-                        if (entity.getMediaURL() != null && !entity.getMediaURL().isEmpty()) {
-                            t.photoUrls.add(entity.getMediaURL());
-                        }
-                        else {
-                            t.photoUrls.add(preferencesHandler.findPreferences().getNoImageUrl());
+                    }
+                }
+            }
+
+            // Media non-photos
+            t.nonPhotoMedia = new LinkedList<>(); {
+                MediaEntity[] mediaEntities = s.getMediaEntities();
+                if (mediaEntities != null && mediaEntities.length >= 1) {
+                    for (MediaEntity entity : mediaEntities) {
+                        if (! "photo".equalsIgnoreCase(entity.getType())) {
+                            t.nonPhotoMedia.add(
+                                ToStringBuilder.reflectionToString(entity)
+                            );
                         }
                     }
                 }
@@ -144,7 +160,7 @@ public class EmailTweetBuilder {
                 statusText.decorate(url, l->"");
             }
 
-            // Newline
+            // Convert newline to Line break
             statusText.decorate("\n", l->"<br />");
         }
         t.text = statusText.toStringDecorated();
