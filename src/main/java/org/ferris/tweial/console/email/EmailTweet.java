@@ -75,4 +75,12 @@ public class EmailTweet {
     public List<String> getYouTubeVideos() {
         return youTubeVideos;
     }
+
+    /*
+     * Non-photo media
+     */
+    protected List<String> nonPhotoMedia;
+    public List<String> getNonPhotoMedia() {
+        return nonPhotoMedia;
+    }
 }
