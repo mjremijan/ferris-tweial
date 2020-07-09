@@ -1,8 +1,11 @@
 package org.ferris.tweial.console.email;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,6 +15,7 @@ import org.ferris.tweial.console.preferences.PreferencesHandler;
 import org.ferris.tweial.console.util.PatternForYouTube;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
+import twitter4j.MediaEntity.Variant;
 import twitter4j.Status;
 import twitter4j.URLEntity;
 import twitter4j.UserMentionEntity;
@@ -141,12 +145,37 @@ public class EmailTweetBuilder {
                 }
             }
 
-            // Media non-photos
+            // Media videos
             t.nonPhotoMedia = new LinkedList<>(); {
                 MediaEntity[] mediaEntities = s.getMediaEntities();
                 if (mediaEntities != null && mediaEntities.length >= 1) {
                     for (MediaEntity entity : mediaEntities) {
-                        if (! "photo".equalsIgnoreCase(entity.getType())) {
+                        if ("video".equalsIgnoreCase(entity.getType())) {
+                            String poster
+                                = entity.getMediaURLHttps();
+
+                            Optional<Variant> vid = Arrays.stream(entity.getVideoVariants())
+                                .filter(v -> v.getContentType().contains("mp4"))
+                                .min(Comparator.comparing(Variant::getBitrate))
+                            ;
+
+                            new EmailVideo.Builder()
+                                .poster(entity.getMediaURLHttps())
+                                .width(entity.getVideoAspectRatioWidth())
+                                .height(entity.getVideoAspectRatioHeight())
+                                .build()
+                            ;
+                        }
+                    }
+                }
+            }
+
+            // Media non-photo and non-video
+            t.nonPhotoMedia = new LinkedList<>(); {
+                MediaEntity[] mediaEntities = s.getMediaEntities();
+                if (mediaEntities != null && mediaEntities.length >= 1) {
+                    for (MediaEntity entity : mediaEntities) {
+                        if (! "photo".equalsIgnoreCase(entity.getType()) && ! "video".equalsIgnoreCase(entity.getType())) {
                             t.nonPhotoMedia.add(
                                 ToStringBuilder.reflectionToString(entity)
                             );
