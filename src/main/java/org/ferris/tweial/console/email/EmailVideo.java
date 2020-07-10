@@ -6,6 +6,8 @@ package org.ferris.tweial.console.email;
  */
 public class EmailVideo {
 
+    private EmailVideo() {}
+
     static class Builder {
         String poster;
         Builder poster(String poster) {
@@ -13,21 +15,41 @@ public class EmailVideo {
             return this;
         }
 
-        int width;
-        Builder width(int width) {
-            this.width = width;
+        String src;
+        Builder src(String src) {
+            this.src = src;
             return this;
         }
 
-        int height;
-        Builder height(int height) {
-            this.height = height;
+        String type;
+        Builder type(String type) {
+            this.type = type;
             return this;
         }
-
 
         EmailVideo build() {
-            return null;
+            EmailVideo v = new EmailVideo();
+
+            v.posterUrl = this.poster;
+            v.srcUrl = this.src;
+            v.srcContentType = this.type;
+
+            return v;
         }
+    }
+
+    private String posterUrl;
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    private String srcUrl;
+    public String getSrcUrl() {
+        return srcUrl;
+    }
+
+    private String srcContentType;
+    public String getSrcContentType() {
+        return srcContentType;
     }
 }

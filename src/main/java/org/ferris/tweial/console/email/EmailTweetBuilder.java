@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -146,24 +145,23 @@ public class EmailTweetBuilder {
             }
 
             // Media videos
-            t.nonPhotoMedia = new LinkedList<>(); {
+            t.videoMedia = new LinkedList<>(); {
                 MediaEntity[] mediaEntities = s.getMediaEntities();
                 if (mediaEntities != null && mediaEntities.length >= 1) {
                     for (MediaEntity entity : mediaEntities) {
                         if ("video".equalsIgnoreCase(entity.getType())) {
-                            String poster
-                                = entity.getMediaURLHttps();
-
-                            Optional<Variant> vid = Arrays.stream(entity.getVideoVariants())
+                            Arrays.stream(entity.getVideoVariants())
                                 .filter(v -> v.getContentType().contains("mp4"))
                                 .min(Comparator.comparing(Variant::getBitrate))
-                            ;
-
-                            new EmailVideo.Builder()
-                                .poster(entity.getMediaURLHttps())
-                                .width(entity.getVideoAspectRatioWidth())
-                                .height(entity.getVideoAspectRatioHeight())
-                                .build()
+                                .ifPresent( v ->
+                                    t.videoMedia.add(
+                                        new EmailVideo.Builder()
+                                            .poster(entity.getMediaURLHttps())
+                                            .src(v.getUrl())
+                                            .type(v.getContentType())
+                                            .build()
+                                    )
+                                )
                             ;
                         }
                     }
