@@ -46,7 +46,7 @@ public class EmailVideo {
                 v.length = String.format("%d:%d", minutes, seconds);
             } else {
                 long seconds  = millis / 1000;
-                v.length = String.format("%0:%d", seconds);
+                v.length = String.format("0:%d", seconds);
             }
 
             return v;
