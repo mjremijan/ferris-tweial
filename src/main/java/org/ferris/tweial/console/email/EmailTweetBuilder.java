@@ -159,6 +159,7 @@ public class EmailTweetBuilder {
                                             .poster(entity.getMediaURLHttps())
                                             .src(v.getUrl())
                                             .type(v.getContentType())
+                                            .millis(entity.getVideoDurationMillis())
                                             .build()
                                     )
                                 )
