@@ -48,7 +48,7 @@
                                     </div>
                                 </#list>
                                 <#list tweet.videos as video>
-                                    <div id="tweialtweetmediavideo" style="padding-top: 5px;">
+                                    <div id="tweialtweetmediavideo" style="padding-top: 5px; text-align: center;">
                                         <video controls muted loop
                                             preload="none"
                                             poster="${video.posterUrl}" 
@@ -80,7 +80,7 @@
                                             </div>
                                         </#list>
                                         <#list tweet.quotedTweet.videos as video>
-                                            <div id="tweialtweetmediavideo" style="padding-top: 5px;">
+                                            <div id="tweialtweetmediavideo" style="padding-top: 5px; text-align: center;" >
                                                 <video controls muted loop
                                                     preload="none"
                                                     poster="${video.posterUrl}" 

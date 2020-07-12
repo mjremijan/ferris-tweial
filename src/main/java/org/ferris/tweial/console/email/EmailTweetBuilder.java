@@ -152,7 +152,7 @@ public class EmailTweetBuilder {
                         if ("video".equalsIgnoreCase(entity.getType())) {
                             Arrays.stream(entity.getVideoVariants())
                                 .filter(v -> v.getContentType().contains("mp4"))
-                                .min(Comparator.comparing(Variant::getBitrate))
+                                .max(Comparator.comparing(Variant::getBitrate))
                                 .ifPresent( v ->
                                     t.videoMedia.add(
                                         new EmailVideo.Builder()
