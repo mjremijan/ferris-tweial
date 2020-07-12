@@ -27,12 +27,27 @@ public class EmailVideo {
             return this;
         }
 
+        long millis;
+        Builder millis(long millis) {
+            this.millis = millis;
+            return this;
+        }
+
         EmailVideo build() {
             EmailVideo v = new EmailVideo();
 
             v.posterUrl = this.poster;
             v.srcUrl = this.src;
             v.srcContentType = this.type;
+
+            if (millis >= 60000) {
+                long minutes = (millis / 1000)  / 60;
+                int seconds = (int)((millis / 1000) % 60);
+                v.length = String.format("%d:%d", minutes, seconds);
+            } else {
+                long seconds  = millis / 1000;
+                v.length = String.format("%0:%d", seconds);
+            }
 
             return v;
         }
@@ -51,5 +66,10 @@ public class EmailVideo {
     private String srcContentType;
     public String getSrcContentType() {
         return srcContentType;
+    }
+
+    private String length;
+    public String getLength() {
+        return length;
     }
 }
