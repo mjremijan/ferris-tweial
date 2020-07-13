@@ -115,6 +115,13 @@
                 </excludes>
                 <filtering>false</filtering>
             </resource> 
+            <resource>
+                <directory>D:\Documents\Development\Resources\ferris-tweial\resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
         </resources>
         <plugins>
             <!--

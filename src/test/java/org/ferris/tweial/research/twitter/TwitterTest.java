@@ -60,7 +60,7 @@ public class TwitterTest extends AbstractPropertiesTest {
         }
         // by id
         if (3==q) {
-            Status status = twitter.showStatus(Long.parseLong("671527460572413952"));
+            Status status = twitter.showStatus(Long.parseLong("1282704838845923331"));
             statuses = Arrays.asList(status);
         }
 
