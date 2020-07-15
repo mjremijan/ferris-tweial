@@ -43,10 +43,10 @@ public class EmailVideo {
             if (millis >= 60000) {
                 long minutes = (millis / 1000)  / 60;
                 int seconds = (int)((millis / 1000) % 60);
-                v.length = String.format("%d:%d", minutes, seconds);
+                v.length = String.format("%d:%02d", minutes, seconds);
             } else {
                 long seconds  = millis / 1000;
-                v.length = String.format("0:%d", seconds);
+                v.length = String.format("0:%02d", seconds);
             }
 
             return v;
