@@ -169,15 +169,44 @@ public class EmailTweetBuilder {
                 }
             }
 
+            // Media animated_gif
+            t.animatedGifMedia = new LinkedList<>(); {
+                MediaEntity[] mediaEntities = s.getMediaEntities();
+                if (mediaEntities != null && mediaEntities.length >= 1) {
+                    for (MediaEntity entity : mediaEntities) {
+                        if ("animated_gif".equalsIgnoreCase(entity.getType())) {
+                            Arrays.stream(entity.getVideoVariants())
+                                .filter(v -> v.getContentType().contains("mp4"))
+                                .max(Comparator.comparing(Variant::getBitrate))
+                                .ifPresent( v ->
+                                    t.animatedGifMedia.add(
+                                        new EmailAnimatedGif.Builder()
+                                            .poster(entity.getMediaURLHttps())
+                                            .src(v.getUrl())
+                                            .type(v.getContentType())
+                                            .build()
+                                    )
+                                )
+                            ;
+                        }
+                    }
+                }
+            }
+
             // Media non-photo and non-video
             t.nonPhotoMedia = new LinkedList<>(); {
                 MediaEntity[] mediaEntities = s.getMediaEntities();
                 if (mediaEntities != null && mediaEntities.length >= 1) {
                     for (MediaEntity entity : mediaEntities) {
-                        if (! "photo".equalsIgnoreCase(entity.getType()) && ! "video".equalsIgnoreCase(entity.getType())) {
-                            t.nonPhotoMedia.add(
-                                ToStringBuilder.reflectionToString(entity)
-                            );
+                        switch (entity.getType().toLowerCase()) {
+                            case "photo":
+                            case "video":
+                            case "animated_gif":
+                                continue;
+                            default:
+                                t.nonPhotoMedia.add(
+                                    ToStringBuilder.reflectionToString(entity)
+                                );
                         }
                     }
                 }

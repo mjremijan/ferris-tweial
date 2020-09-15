@@ -91,4 +91,12 @@ public class EmailTweet {
     public List<EmailVideo> getVideos() {
         return videoMedia;
     }
+
+    /*
+     * Media animated gif
+     */
+    protected List<EmailAnimatedGif> animatedGifMedia;
+    public List<EmailAnimatedGif> getAnimatedGifs() {
+        return animatedGifMedia;
+    }
 }
