@@ -32,6 +32,7 @@ public class PatternForYouTubeTest {
 
         // Assert
         Assert.assertTrue(p.matches());
+        Assert.assertEquals("eqmD6oXw-co", p.getVidId());
     }
 
     @Test
@@ -44,6 +45,7 @@ public class PatternForYouTubeTest {
 
         // Assert
         Assert.assertTrue(p.matches());
+        Assert.assertEquals("RaSmassvv4w", p.getVidId());
     }
 
     @Test
@@ -56,5 +58,66 @@ public class PatternForYouTubeTest {
 
         // Assert
         Assert.assertTrue(p.matches());
+        Assert.assertEquals("RaSmassvv4w", p.getVidId());
+    }
+
+
+    @Test
+    public void test_matches_with_v_having_request_parameters() {
+        // Arrange
+        PatternForYouTube p;
+
+        // Act
+        p = new PatternForYouTube("https://www.youtube.com/watch?v=TGjjTc6Hqzs&feature=youtu.be");
+
+        // Assert
+        Assert.assertTrue(p.matches());
+        Assert.assertEquals("TGjjTc6Hqzs", p.getVidId());
+    }
+
+    @Test
+    public void test_matches_with_v_having_request_parameters_backwards() {
+        // Arrange
+        PatternForYouTube p;
+
+        // Act
+        p = new PatternForYouTube("https://www.youtube.com/watch?feature=youtu.be&v=TGjjTc6Hqzs");
+
+        // Assert
+        Assert.assertTrue(p.matches());
+        Assert.assertEquals("TGjjTc6Hqzs", p.getVidId());
+    }
+
+    @Test
+    public void test_matches_with_v_having_multiple_request_parameters() {
+        // Arrange
+        PatternForYouTube p;
+
+        // Act
+        p = new PatternForYouTube("https://www.youtube.com/watch?v=TGjjTc6Hqzs&a=one&b=two&feature=youtu.be&");
+
+        // Assert
+        Assert.assertTrue(p.matches());
+        Assert.assertEquals("TGjjTc6Hqzs", p.getVidId());
+    }
+
+    @Test
+    public void test_throws_exception_without_v_parameter() {
+        // Arrange
+        RuntimeException expected = null;
+
+        // Act
+        try {
+            new PatternForYouTube("https://www.youtube.com/watch?m=TGjjTc6Hqzs&feature=youtu.be");
+        } catch (RuntimeException e) {
+            expected = e;
+        }
+
+        // Assert
+        Assert.assertNotNull(expected);
+        Assert.assertEquals(
+            "Unable to find YouTube video ID in \"m=TGjjTc6Hqzs&feature=youtu.be\""
+            , expected.getMessage()
+        );
     }
 }

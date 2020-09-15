@@ -4,7 +4,7 @@
 
     <groupId>org.ferris</groupId>    
     <artifactId>ferris-tweial</artifactId>
-    <version>1.2.0.0-SNAPSHOT</version>
+    <version>1.2.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <organization>
@@ -115,6 +115,13 @@
                 </excludes>
                 <filtering>false</filtering>
             </resource> 
+            <resource>
+                <directory>D:\Documents\Development\Resources\ferris-tweial\resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
         </resources>
         <plugins>
             <!--
