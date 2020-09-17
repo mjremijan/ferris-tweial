@@ -1,6 +1,8 @@
 package org.ferris.tweial.console.email;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -12,6 +14,7 @@ import org.ferris.tweial.console.preferences.PreferencesHandler;
 import org.ferris.tweial.console.util.PatternForYouTube;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
+import twitter4j.MediaEntity.Variant;
 import twitter4j.Status;
 import twitter4j.URLEntity;
 import twitter4j.UserMentionEntity;
@@ -141,15 +144,69 @@ public class EmailTweetBuilder {
                 }
             }
 
-            // Media non-photos
+            // Media videos
+            t.videoMedia = new LinkedList<>(); {
+                MediaEntity[] mediaEntities = s.getMediaEntities();
+                if (mediaEntities != null && mediaEntities.length >= 1) {
+                    for (MediaEntity entity : mediaEntities) {
+                        if ("video".equalsIgnoreCase(entity.getType())) {
+                            Arrays.stream(entity.getVideoVariants())
+                                .filter(v -> v.getContentType().contains("mp4"))
+                                .max(Comparator.comparing(Variant::getBitrate))
+                                .ifPresent( v ->
+                                    t.videoMedia.add(
+                                        new EmailVideo.Builder()
+                                            .poster(entity.getMediaURLHttps())
+                                            .src(v.getUrl())
+                                            .type(v.getContentType())
+                                            .millis(entity.getVideoDurationMillis())
+                                            .build()
+                                    )
+                                )
+                            ;
+                        }
+                    }
+                }
+            }
+
+            // Media animated_gif
+            t.animatedGifMedia = new LinkedList<>(); {
+                MediaEntity[] mediaEntities = s.getMediaEntities();
+                if (mediaEntities != null && mediaEntities.length >= 1) {
+                    for (MediaEntity entity : mediaEntities) {
+                        if ("animated_gif".equalsIgnoreCase(entity.getType())) {
+                            Arrays.stream(entity.getVideoVariants())
+                                .filter(v -> v.getContentType().contains("mp4"))
+                                .max(Comparator.comparing(Variant::getBitrate))
+                                .ifPresent( v ->
+                                    t.animatedGifMedia.add(
+                                        new EmailAnimatedGif.Builder()
+                                            .poster(entity.getMediaURLHttps())
+                                            .src(v.getUrl())
+                                            .type(v.getContentType())
+                                            .build()
+                                    )
+                                )
+                            ;
+                        }
+                    }
+                }
+            }
+
+            // Media non-photo and non-video
             t.nonPhotoMedia = new LinkedList<>(); {
                 MediaEntity[] mediaEntities = s.getMediaEntities();
                 if (mediaEntities != null && mediaEntities.length >= 1) {
                     for (MediaEntity entity : mediaEntities) {
-                        if (! "photo".equalsIgnoreCase(entity.getType())) {
-                            t.nonPhotoMedia.add(
-                                ToStringBuilder.reflectionToString(entity)
-                            );
+                        switch (entity.getType().toLowerCase()) {
+                            case "photo":
+                            case "video":
+                            case "animated_gif":
+                                continue;
+                            default:
+                                t.nonPhotoMedia.add(
+                                    ToStringBuilder.reflectionToString(entity)
+                                );
                         }
                     }
                 }
