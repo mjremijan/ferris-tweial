@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
  */
 public class PatternForYouTube {
 
-    protected Pattern p = Pattern.compile("https?:\\/\\/www\\.youtube\\.com\\/watch\\?(.*)");
+    protected Pattern p1 = Pattern.compile("https?:\\/\\/www\\.youtube\\.com\\/watch\\?(.*)");
+    protected Pattern p2 = Pattern.compile("https?:\\/\\/youtu\\.be\\/(.*)");
 
     protected boolean matches = false;
     public boolean matches() {
@@ -21,21 +22,41 @@ public class PatternForYouTube {
     public String getVidId() {
         return vidId;
     }
-    private void setVidId(String requestParameters) {
-        vidId = Arrays.stream(requestParameters.split("&"))
-            .filter(nv -> nv.startsWith("v="))
-            .map((nv -> nv.substring(2)))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("Unable to find YouTube video ID in \"%s\"", requestParameters)))
-        ;
-    }
 
     public PatternForYouTube(String url) {
-        Matcher m = p.matcher(url);
-        if (m.matches() && m.groupCount() == 1) {
-            this.matches = true;
-            this.setVidId(m.group(1));
+        pattern1(url);
+        pattern2(url);
+    }
+
+    private void pattern1(String url) {
+        if (this.matches == false) {
+            Matcher m = p1.matcher(url);
+            if (m.matches() && m.groupCount() == 1) {
+                this.matches = true;
+                this.vidId = Arrays.stream(m.group(1).split("&"))
+                    .filter(nv -> nv.startsWith("v="))
+                    .map((nv -> nv.substring(2)))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException(String.format("Unable to find YouTube video ID in \"%s\"", m.group(1))))
+                ;
+            }
         }
     }
+
+     private void pattern2(String url) {
+        if (this.matches == false) {
+            Matcher m = p2.matcher(url);
+            if (m.matches() && m.groupCount() == 1) {
+                this.matches = true;
+                this.vidId = m.group(1).trim();
+                if (this.vidId.isEmpty()) {
+                    throw new RuntimeException(String.format("Unable to find YouTube video ID in \"%s\"", url));
+                }
+
+            }
+        }
+    }
+
+
 
 }
