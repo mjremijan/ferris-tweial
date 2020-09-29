@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
  */
 public class PatternForYouTube {
 
-    protected Pattern p1 = Pattern.compile("https?:\\/\\/www\\.youtube\\.com\\/watch\\?(.*)");
-    protected Pattern p2 = Pattern.compile("https?:\\/\\/youtu\\.be\\/(.*)");
+    protected static Pattern p1 = Pattern.compile("https?:\\/\\/www\\.youtube\\.com\\/watch\\?(.*)");
+    protected static Pattern p2 = Pattern.compile("https?:\\/\\/youtu\\.be\\/(.*)");
 
     protected boolean matches = false;
     public boolean matches() {
