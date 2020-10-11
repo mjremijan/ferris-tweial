@@ -12,14 +12,14 @@ ferris-tweial,org.ferris.tweial.console.twitter,TwitterStartupObserver,53,0,4,0,
 ferris-tweial,org.ferris.tweial.console.twitter,TwitterBuilder,43,0,0,0,12,0,3,0,3,0
 ferris-tweial,org.ferris.tweial.console.twitter,TweetRetrievalEvent,0,63,0,6,0,13,0,10,0,7
 ferris-tweial,org.ferris.tweial.console.twitter,TwitterAccount,39,0,0,0,10,0,5,0,5,0
-ferris-tweial,org.ferris.tweial.console.twitter,TwitterPage,275,0,20,0,50,0,14,0,4,0
+ferris-tweial,org.ferris.tweial.console.twitter,TwitterPage,303,0,20,0,52,0,14,0,4,0
 ferris-tweial,org.ferris.tweial.console.twitter,TweetFilter,6,50,1,1,2,11,1,4,0,4
 ferris-tweial,org.ferris.tweial.console.twitter,TwitterDataSource,15,0,0,0,6,0,3,0,3,0
 ferris-tweial,org.ferris.tweial.console.twitter,TwitterHandler,134,0,4,0,37,0,10,0,8,0
 ferris-tweial,org.ferris.tweial.console.twitter,TwitterPropertiesFile,5,0,0,0,2,0,1,0,1,0
 ferris-tweial,org.ferris.tweial.console.util,PropertiesFile,35,175,8,8,2,41,9,6,1,6
 ferris-tweial,org.ferris.tweial.console.util,ArrayTools,17,57,0,6,4,12,2,5,2,2
-ferris-tweial,org.ferris.tweial.console.util,PatternForYouTube,0,36,1,3,0,10,1,4,0,3
+ferris-tweial,org.ferris.tweial.console.util,PatternForYouTube,0,122,3,11,0,27,3,13,0,9
 ferris-tweial,org.ferris.tweial.console.retry,ExceptionRetryInterceptor,54,0,4,0,13,0,4,0,2,0
 ferris-tweial,org.ferris.tweial.console.data,DataDirectory,21,0,2,0,5,0,2,0,1,0
 ferris-tweial,org.ferris.tweial.console.data,DataDirectoryProducer,14,0,0,0,4,0,3,0,3,0
@@ -27,14 +27,18 @@ ferris-tweial,org.ferris.tweial.console.view.page,AbstractPage,0,3,0,0,0,1,0,1,0
 ferris-tweial,org.ferris.tweial.console.email,EmailSender.new Authenticator() {...},19,0,0,0,4,0,2,0,2,0
 ferris-tweial,org.ferris.tweial.console.email,EmailStartupObserver,0,53,2,2,0,14,2,3,0,3
 ferris-tweial,org.ferris.tweial.console.email,EmailRendererByFreeMarker,48,147,2,0,15,37,2,5,1,5
-ferris-tweial,org.ferris.tweial.console.email,EmailTweetBuilder,22,349,6,40,4,57,8,24,2,7
+ferris-tweial,org.ferris.tweial.console.email,EmailVideo.Builder,100,0,2,0,21,0,7,0,6,0
+ferris-tweial,org.ferris.tweial.console.email,EmailAnimatedGif,12,0,0,0,4,0,4,0,4,0
+ferris-tweial,org.ferris.tweial.console.email,EmailTweetBuilder,120,456,20,60,27,70,24,29,6,6
 ferris-tweial,org.ferris.tweial.console.email,EmailDataSource,0,15,0,0,0,6,0,3,0,3
 ferris-tweial,org.ferris.tweial.console.email,EmailPropertiesFile,0,5,0,0,0,2,0,1,0,1
-ferris-tweial,org.ferris.tweial.console.email,EmailTweet,0,34,0,2,0,10,0,11,0,10
+ferris-tweial,org.ferris.tweial.console.email,EmailTweet,9,34,0,2,3,10,3,11,3,10
 ferris-tweial,org.ferris.tweial.console.email,EmailPage,19,45,0,0,4,10,1,3,1,3
 ferris-tweial,org.ferris.tweial.console.email,EmailHandler,0,38,0,0,0,9,0,4,0,4
+ferris-tweial,org.ferris.tweial.console.email,EmailVideo,15,0,0,0,5,0,5,0,5,0
 ferris-tweial,org.ferris.tweial.console.email,EmailSender,190,0,10,0,43,0,8,0,3,0
 ferris-tweial,org.ferris.tweial.console.email,EmailSendEvent,18,6,0,0,7,3,5,1,5,1
+ferris-tweial,org.ferris.tweial.console.email,EmailAnimatedGif.Builder,40,0,0,0,12,0,5,0,5,0
 ferris-tweial,org.ferris.tweial.console.email,EmailSendPriority,3,0,0,0,1,0,1,0,1,0
 ferris-tweial,org.ferris.tweial.console.email,EmailAccount,6,126,0,8,2,40,2,18,2,14
 ferris-tweial,org.ferris.tweial.console.util.version,Version,45,68,0,12,12,26,1,11,1,5

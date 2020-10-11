@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailTweetBuilder.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailTweetBuilder.java</span></div><h1>EmailTweetBuilder.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import javax.inject.Inject;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.ferris.tweial.console.lang.StringDecorator;
 import org.ferris.tweial.console.preferences.PreferencesHandler;
 import org.ferris.tweial.console.util.PatternForYouTube;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
+import twitter4j.MediaEntity.Variant;
 import twitter4j.Status;
 import twitter4j.URLEntity;
 import twitter4j.UserMentionEntity;
@@ -19,7 +23,7 @@ import twitter4j.UserMentionEntity;
  *
  * @author Michael Remijan mjremijan@yahoo.com @mjremijan
  */
-<span class="fc" id="L22">public class EmailTweetBuilder {</span>
+<span class="fc" id="L26">public class EmailTweetBuilder {</span>
 
     @Inject
     protected Logger log;
@@ -29,75 +33,70 @@ import twitter4j.UserMentionEntity;
 
     public EmailTweet build(Status status)
     {
-<span class="fc" id="L32">        EmailTweet t = new EmailTweet();</span>
+<span class="fc" id="L36">        EmailTweet t = new EmailTweet();</span>
 
         // Retweeter name
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        t.retweeterName = (status.isRetweet()) ? status.getUser().getName() : null;</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        t.retweeterName = (status.isRetweet()) ? status.getUser().getName() : null;</span>
 
         // Which status to use for the tweet
-<span class="fc bfc" id="L38" title="All 2 branches covered.">        Status s = (status.isRetweet() ? status.getRetweetedStatus() : status);</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        Status s = (status.isRetweet() ? status.getRetweetedStatus() : status);</span>
 
         // User
-<span class="fc" id="L41">        t.user = s.getUser();</span>
+<span class="fc" id="L45">        t.user = s.getUser();</span>
 
         // Id
-<span class="fc" id="L44">        t.id = Long.toString(s.getId());</span>
+<span class="fc" id="L48">        t.id = Long.toString(s.getId());</span>
 
         // CreatedAt
-<span class="fc bfc" id="L47" title="All 2 branches covered.">        t.createdAt = (s.getCreatedAt() == null) ? null :</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        t.createdAt = (s.getCreatedAt() == null) ? null :</span>
             new SimpleDateFormat(&quot;M/d h:mma&quot;)
-<span class="fc" id="L49">            .format(s.getCreatedAt())</span>
-<span class="fc" id="L50">            .toLowerCase()</span>
-<span class="fc" id="L51">            .replace(&quot;m&quot;, &quot;&quot;)</span>
+<span class="fc" id="L53">            .format(s.getCreatedAt())</span>
+<span class="fc" id="L54">            .toLowerCase()</span>
+<span class="fc" id="L55">            .replace(&quot;m&quot;, &quot;&quot;)</span>
         ;
 
         // List of YouTube videos
-<span class="fc" id="L55">        t.youTubeVideos = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L59">        t.youTubeVideos = new LinkedList&lt;&gt;();</span>
 
         // Status Text
-<span class="fc bfc" id="L58" title="All 2 branches covered.">        StringDecorator statusText = (s.getText() == null) ? new StringDecorator(&quot;&quot;) : new StringDecorator(s.getText());</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        StringDecorator statusText = (s.getText() == null) ? new StringDecorator(&quot;&quot;) : new StringDecorator(s.getText());</span>
         {
             // List of unique URLs to decorate/remove from the tweet text
-<span class="fc" id="L61">            Set&lt;String&gt; urlsToRemoveFromTweetText = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L65">            Set&lt;String&gt; urlsToRemoveFromTweetText = new HashSet&lt;&gt;();</span>
 
             // URLs
-<span class="fc" id="L64">            URLEntity[] urlEntities = s.getURLEntities();</span>
-<span class="fc bfc" id="L65" title="All 2 branches covered.">            if (urlEntities != null) {</span>
-<span class="fc bfc" id="L66" title="All 2 branches covered.">                for (URLEntity entity : urlEntities) {</span>
-<span class="fc" id="L67">                    String expandedUrl = entity.getExpandedURL();</span>
-<span class="pc bpc" id="L68" title="1 of 4 branches missed.">                    if (s.getQuotedStatus() != null &amp;&amp; expandedUrl.contains(String.format(&quot;%d&quot;,s.getQuotedStatus().getId()))) {</span>
-<span class="nc" id="L69">                        statusText.decorate(</span>
-<span class="nc" id="L70">                              entity.getStart(), entity.getEnd() - 1</span>
-<span class="nc" id="L71">                            , (m) -&gt; &quot;&quot;</span>
+<span class="fc" id="L68">            URLEntity[] urlEntities = s.getURLEntities();</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">            if (urlEntities != null) {</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">                for (URLEntity entity : urlEntities) {</span>
+<span class="fc" id="L71">                    String expandedUrl = entity.getExpandedURL();</span>
+<span class="pc bpc" id="L72" title="1 of 4 branches missed.">                    if (s.getQuotedStatus() != null &amp;&amp; expandedUrl.contains(String.format(&quot;%d&quot;,s.getQuotedStatus().getId()))) {</span>
+<span class="nc" id="L73">                        statusText.decorate(</span>
+<span class="nc" id="L74">                              entity.getStart(), entity.getEnd() - 1</span>
+<span class="nc" id="L75">                            , (m) -&gt; &quot;&quot;</span>
                         );
                     } else {
-<span class="fc" id="L74">                        PatternForYouTube p = new PatternForYouTube(expandedUrl);</span>
-<span class="fc bfc" id="L75" title="All 2 branches covered.">                        if (p.matches()) {</span>
-<span class="fc" id="L76">                            t.youTubeVideos.add(p.getVidId());</span>
-<span class="fc" id="L77">                            statusText.decorate(</span>
-<span class="fc" id="L78">                                    entity.getStart(), entity.getEnd() - 1</span>
-<span class="fc" id="L79">                                , (m) -&gt; &quot;&quot;</span>
-                            );
-                        } else {
-<span class="fc" id="L82">                            statusText.decorate(</span>
-<span class="fc" id="L83">                                  entity.getStart(), entity.getEnd() - 1</span>
-<span class="fc" id="L84">                                , (m) -&gt; String.format(&quot;&lt;a href=\&quot;%1$s\&quot;&gt;%1$s&lt;/a&gt;&quot;, expandedUrl)</span>
-                            );
+<span class="fc" id="L78">                        PatternForYouTube p = new PatternForYouTube(expandedUrl);</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">                        if (p.matches()) {</span>
+<span class="fc" id="L80">                            t.youTubeVideos.add(p.getVidId());</span>
                         }
+<span class="fc" id="L82">                        statusText.decorate(</span>
+<span class="fc" id="L83">                              entity.getStart(), entity.getEnd() - 1</span>
+<span class="fc" id="L84">                            , (m) -&gt; String.format(&quot;&lt;a href=\&quot;%1$s\&quot;&gt;%1$s&lt;/a&gt;&quot;, expandedUrl)</span>
+                        );
                     }
                 }
             }
 
             // Hashtags
             // https://twitter.com/search?q=%23UnlimitedScreaming
-<span class="fc" id="L93">            HashtagEntity[] hashtagEntities = s.getHashtagEntities();</span>
-<span class="fc bfc" id="L94" title="All 2 branches covered.">            if (hashtagEntities != null) {</span>
-<span class="fc bfc" id="L95" title="All 2 branches covered.">                for (HashtagEntity entity : hashtagEntities) {</span>
-<span class="fc" id="L96">                    statusText.decorate(</span>
-<span class="fc" id="L97">                          entity.getStart(), entity.getEnd() - 1</span>
-<span class="fc" id="L98">                        , (m) -&gt; String.format(</span>
+<span class="fc" id="L92">            HashtagEntity[] hashtagEntities = s.getHashtagEntities();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            if (hashtagEntities != null) {</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">                for (HashtagEntity entity : hashtagEntities) {</span>
+<span class="fc" id="L95">                    statusText.decorate(</span>
+<span class="fc" id="L96">                          entity.getStart(), entity.getEnd() - 1</span>
+<span class="fc" id="L97">                        , (m) -&gt; String.format(</span>
                               &quot;&lt;a href=\&quot;https://twitter.com/search?f=tweets&amp;vertical=default&amp;q=%%23%1$s\&quot;&gt;#%1$s&lt;/a&gt;&quot;
-<span class="fc" id="L100">                            , entity.getText()</span>
+<span class="fc" id="L99">                            , entity.getText()</span>
                           )
                     );
                 }
@@ -106,54 +105,125 @@ import twitter4j.UserMentionEntity;
             // User mentions
             // https://twitter.com/farmtrukstl/
             // https://twitter.com/PTXofficial/
-<span class="fc" id="L109">            UserMentionEntity[] userMentionEntities = s.getUserMentionEntities();</span>
-<span class="fc bfc" id="L110" title="All 2 branches covered.">            if (userMentionEntities != null) {</span>
-<span class="fc bfc" id="L111" title="All 2 branches covered.">                for (UserMentionEntity entity : userMentionEntities) {</span>
-<span class="fc" id="L112">                    statusText.decorate(</span>
-<span class="fc" id="L113">                          entity.getStart(), entity.getEnd()-1</span>
-<span class="fc" id="L114">                        , (m) -&gt; String.format(&quot;&lt;a href=\&quot;https://twitter.com/%1$s\&quot;&gt;@%1$s&lt;/a&gt;&quot;, entity.getScreenName())</span>
+<span class="fc" id="L108">            UserMentionEntity[] userMentionEntities = s.getUserMentionEntities();</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            if (userMentionEntities != null) {</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">                for (UserMentionEntity entity : userMentionEntities) {</span>
+<span class="fc" id="L111">                    statusText.decorate(</span>
+<span class="fc" id="L112">                          entity.getStart(), entity.getEnd()-1</span>
+<span class="fc" id="L113">                        , (m) -&gt; String.format(&quot;&lt;a href=\&quot;https://twitter.com/%1$s\&quot;&gt;@%1$s&lt;/a&gt;&quot;, entity.getScreenName())</span>
                     );
                 }
             }
 
             // Media photos
-<span class="fc" id="L120">            t.photoUrls = new LinkedList&lt;&gt;();</span>
-<span class="fc" id="L121">            MediaEntity[] mediaEntities = s.getMediaEntities();</span>
-<span class="pc bpc" id="L122" title="1 of 4 branches missed.">            if (mediaEntities != null &amp;&amp; mediaEntities.length &gt;= 1) {</span>
-<span class="fc bfc" id="L123" title="All 2 branches covered.">                for (MediaEntity entity : mediaEntities) {</span>
-<span class="pc bpc" id="L124" title="1 of 2 branches missed.">                    if (&quot;photo&quot;.equalsIgnoreCase(entity.getType())) {</span>
-                        // URL of photo in tweet (possibly)
-<span class="fc" id="L126">                        urlsToRemoveFromTweetText.add(entity.getURL());</span>
-                        // URL of photo
-<span class="pc bpc" id="L128" title="1 of 4 branches missed.">                        if (entity.getMediaURLHttps() != null &amp;&amp; !entity.getMediaURLHttps().isEmpty()) {</span>
-<span class="fc" id="L129">                            t.photoUrls.add(entity.getMediaURLHttps());</span>
+<span class="fc" id="L119">            t.photoUrls = new LinkedList&lt;&gt;(); {</span>
+<span class="fc" id="L120">            MediaEntity[] mediaEntities = s.getMediaEntities();</span>
+<span class="pc bpc" id="L121" title="1 of 4 branches missed.">                if (mediaEntities != null &amp;&amp; mediaEntities.length &gt;= 1) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">                    for (MediaEntity entity : mediaEntities) {</span>
+<span class="pc bpc" id="L123" title="1 of 2 branches missed.">                        if (&quot;photo&quot;.equalsIgnoreCase(entity.getType())) {</span>
+                            // URL of photo in tweet (possibly)
+<span class="fc" id="L125">                            urlsToRemoveFromTweetText.add(entity.getURL());</span>
+                            // URL of photo
+<span class="pc bpc" id="L127" title="1 of 4 branches missed.">                            if (entity.getMediaURLHttps() != null &amp;&amp; !entity.getMediaURLHttps().isEmpty()) {</span>
+<span class="fc" id="L128">                                t.photoUrls.add(entity.getMediaURLHttps());</span>
+                            }
+                            else
+<span class="pc bpc" id="L131" title="2 of 4 branches missed.">                            if (entity.getMediaURL() != null &amp;&amp; !entity.getMediaURL().isEmpty()) {</span>
+<span class="fc" id="L132">                                t.photoUrls.add(entity.getMediaURL());</span>
+                            }
+                            else {
+<span class="nc" id="L135">                                t.photoUrls.add(preferencesHandler.findPreferences().getNoImageUrl());</span>
+                            }
                         }
-                        else
-<span class="pc bpc" id="L132" title="2 of 4 branches missed.">                        if (entity.getMediaURL() != null &amp;&amp; !entity.getMediaURL().isEmpty()) {</span>
-<span class="fc" id="L133">                            t.photoUrls.add(entity.getMediaURL());</span>
+                    }
+                }
+            }
+
+            // Media videos
+<span class="fc" id="L143">            t.videoMedia = new LinkedList&lt;&gt;(); {</span>
+<span class="fc" id="L144">                MediaEntity[] mediaEntities = s.getMediaEntities();</span>
+<span class="pc bpc" id="L145" title="1 of 4 branches missed.">                if (mediaEntities != null &amp;&amp; mediaEntities.length &gt;= 1) {</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">                    for (MediaEntity entity : mediaEntities) {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">                        if (&quot;video&quot;.equalsIgnoreCase(entity.getType())) {</span>
+<span class="nc" id="L148">                            Arrays.stream(entity.getVideoVariants())</span>
+<span class="nc" id="L149">                                .filter(v -&gt; v.getContentType().contains(&quot;mp4&quot;))</span>
+<span class="nc" id="L150">                                .max(Comparator.comparing(Variant::getBitrate))</span>
+<span class="nc" id="L151">                                .ifPresent( v -&gt; {</span>
+<span class="nc" id="L152">                                        urlsToRemoveFromTweetText.add(entity.getURL());</span>
+<span class="nc" id="L153">                                        t.videoMedia.add(</span>
+                                            new EmailVideo.Builder()
+<span class="nc" id="L155">                                                .poster(entity.getMediaURLHttps())</span>
+<span class="nc" id="L156">                                                .src(v.getUrl())</span>
+<span class="nc" id="L157">                                                .type(v.getContentType())</span>
+<span class="nc" id="L158">                                                .millis(entity.getVideoDurationMillis())</span>
+<span class="nc" id="L159">                                                .build()</span>
+                                        );
+<span class="nc" id="L161">                                    }</span>
+                                )
+                            ;
                         }
-                        else {
-<span class="nc" id="L136">                            t.photoUrls.add(preferencesHandler.findPreferences().getNoImageUrl());</span>
+                    }
+                }
+            }
+
+            // Media animated_gif
+<span class="fc" id="L170">            t.animatedGifMedia = new LinkedList&lt;&gt;(); {</span>
+<span class="fc" id="L171">                MediaEntity[] mediaEntities = s.getMediaEntities();</span>
+<span class="pc bpc" id="L172" title="1 of 4 branches missed.">                if (mediaEntities != null &amp;&amp; mediaEntities.length &gt;= 1) {</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">                    for (MediaEntity entity : mediaEntities) {</span>
+<span class="pc bpc" id="L174" title="1 of 2 branches missed.">                        if (&quot;animated_gif&quot;.equalsIgnoreCase(entity.getType())) {</span>
+<span class="nc" id="L175">                            Arrays.stream(entity.getVideoVariants())</span>
+<span class="nc" id="L176">                                .filter(v -&gt; v.getContentType().contains(&quot;mp4&quot;))</span>
+<span class="nc" id="L177">                                .max(Comparator.comparing(Variant::getBitrate))</span>
+<span class="nc" id="L178">                                .ifPresent( v -&gt;</span>
+<span class="nc" id="L179">                                    t.animatedGifMedia.add(</span>
+                                        new EmailAnimatedGif.Builder()
+<span class="nc" id="L181">                                            .poster(entity.getMediaURLHttps())</span>
+<span class="nc" id="L182">                                            .src(v.getUrl())</span>
+<span class="nc" id="L183">                                            .type(v.getContentType())</span>
+<span class="nc" id="L184">                                            .build()</span>
+                                    )
+                                )
+                            ;
+                        }
+                    }
+                }
+            }
+
+            // Media non-photo and non-video
+<span class="fc" id="L194">            t.nonPhotoMedia = new LinkedList&lt;&gt;(); {</span>
+<span class="fc" id="L195">                MediaEntity[] mediaEntities = s.getMediaEntities();</span>
+<span class="pc bpc" id="L196" title="1 of 4 branches missed.">                if (mediaEntities != null &amp;&amp; mediaEntities.length &gt;= 1) {</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">                    for (MediaEntity entity : mediaEntities) {</span>
+<span class="pc bpc" id="L198" title="9 of 12 branches missed.">                        switch (entity.getType().toLowerCase()) {</span>
+                            case &quot;photo&quot;:
+                            case &quot;video&quot;:
+                            case &quot;animated_gif&quot;:
+<span class="fc" id="L202">                                continue;</span>
+                            default:
+<span class="nc" id="L204">                                t.nonPhotoMedia.add(</span>
+<span class="nc" id="L205">                                    ToStringBuilder.reflectionToString(entity)</span>
+                                );
                         }
                     }
                 }
             }
 
             // Remove urls from tweet text;
-<span class="fc bfc" id="L143" title="All 2 branches covered.">            for (String url : urlsToRemoveFromTweetText) {</span>
-<span class="fc" id="L144">                statusText.decorate(url, l-&gt;&quot;&quot;);</span>
-<span class="fc" id="L145">            }</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">            for (String url : urlsToRemoveFromTweetText) {</span>
+<span class="fc" id="L214">                statusText.decorate(url, l-&gt;&quot;&quot;);</span>
+<span class="fc" id="L215">            }</span>
 
-            // Newline
-<span class="pc" id="L148">            statusText.decorate(&quot;\n&quot;, l-&gt;&quot;&lt;br /&gt;&quot;);</span>
+            // Convert newline to Line break
+<span class="pc" id="L218">            statusText.decorate(&quot;\n&quot;, l-&gt;&quot;&lt;br /&gt;&quot;);</span>
         }
-<span class="fc" id="L150">        t.text = statusText.toStringDecorated();</span>
+<span class="fc" id="L220">        t.text = statusText.toStringDecorated();</span>
 
         // Quoted tweet
-<span class="fc bfc" id="L153" title="All 2 branches covered.">        t.quotedTweet = (s.getQuotedStatus() == null) ? null : this.build(s.getQuotedStatus());</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">        t.quotedTweet = (s.getQuotedStatus() == null) ? null : this.build(s.getQuotedStatus());</span>
 
         // Return
-<span class="fc" id="L156">        return t;</span>
+<span class="fc" id="L226">        return t;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

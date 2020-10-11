@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../resources/report.css" type="text/css"/><link rel="shortcut icon" href="../resources/report.gif" type="image/gif"/><title>EmailAnimatedGif.java</title><link rel="stylesheet" href="../resources/prettify.css" type="text/css"/><script type="text/javascript" src="../resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ferris-tweial</a> &gt; <a href="index.source.html" class="el_package">org.ferris.tweial.console.email</a> &gt; <span class="el_source">EmailAnimatedGif.java</span></div><h1>EmailAnimatedGif.java</h1><pre class="source lang-java linenums">package org.ferris.tweial.console.email;
+
+/**
+ *
+ * @author Michael Remijan mjremijan@yahoo.com @mjremijan
+ */
+public class EmailAnimatedGif {
+
+<span class="nc" id="L9">    private EmailAnimatedGif() {}</span>
+
+<span class="nc" id="L11">    static class Builder {</span>
+        String poster;
+        Builder poster(String poster) {
+<span class="nc" id="L14">            this.poster = poster;</span>
+<span class="nc" id="L15">            return this;</span>
+        }
+
+        String src;
+        Builder src(String src) {
+<span class="nc" id="L20">            this.src = src;</span>
+<span class="nc" id="L21">            return this;</span>
+        }
+
+        String type;
+        Builder type(String type) {
+<span class="nc" id="L26">            this.type = type;</span>
+<span class="nc" id="L27">            return this;</span>
+        }
+
+        EmailAnimatedGif build() {
+<span class="nc" id="L31">            EmailAnimatedGif v = new EmailAnimatedGif();</span>
+
+<span class="nc" id="L33">            v.posterUrl = this.poster;</span>
+<span class="nc" id="L34">            v.srcUrl = this.src;</span>
+<span class="nc" id="L35">            v.srcContentType = this.type;</span>
+
+<span class="nc" id="L37">            return v;</span>
+        }
+    }
+
+    private String posterUrl;
+    public String getPosterUrl() {
+<span class="nc" id="L43">        return posterUrl;</span>
+    }
+
+    private String srcUrl;
+    public String getSrcUrl() {
+<span class="nc" id="L48">        return srcUrl;</span>
+    }
+
+    private String srcContentType;
+    public String getSrcContentType() {
+<span class="nc" id="L53">        return srcContentType;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

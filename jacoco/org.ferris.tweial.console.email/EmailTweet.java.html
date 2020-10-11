@@ -75,5 +75,29 @@ import twitter4j.User;
     public List&lt;String&gt; getYouTubeVideos() {
 <span class="fc" id="L76">        return youTubeVideos;</span>
     }
+
+    /*
+     * Non-photo media
+     */
+    protected List&lt;String&gt; nonPhotoMedia;
+    public List&lt;String&gt; getNonPhotoMedia() {
+<span class="nc" id="L84">        return nonPhotoMedia;</span>
+    }
+
+    /*
+     * Media video
+     */
+    protected List&lt;EmailVideo&gt; videoMedia;
+    public List&lt;EmailVideo&gt; getVideos() {
+<span class="nc" id="L92">        return videoMedia;</span>
+    }
+
+    /*
+     * Media animated gif
+     */
+    protected List&lt;EmailAnimatedGif&gt; animatedGifMedia;
+    public List&lt;EmailAnimatedGif&gt; getAnimatedGifs() {
+<span class="nc" id="L100">        return animatedGifMedia;</span>
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

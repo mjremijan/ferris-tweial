@@ -14,6 +14,7 @@ import org.ferris.tweial.console.text.i18n.LocalizedStringKey;
 import org.ferris.tweial.console.view.page.AbstractPage;
 import org.jboss.weld.experimental.Priority;
 import twitter4j.HashtagEntity;
+import twitter4j.MediaEntity;
 import twitter4j.Status;
 import twitter4j.URLEntity;
 import twitter4j.UserMentionEntity;
@@ -23,7 +24,7 @@ import twitter4j.UserMentionEntity;
  *
  * @author Michael Remijan mjremijan@yahoo.com @mjremijan
  */
-<span class="nc" id="L26">public class TwitterPage extends AbstractPage {</span>
+<span class="nc" id="L27">public class TwitterPage extends AbstractPage {</span>
 
     @Inject
     protected Console console;
@@ -44,102 +45,101 @@ import twitter4j.UserMentionEntity;
     protected LocalizedString heading;
 
     public void viewDataSourceMissing(String description) {
-<span class="nc" id="L47">        log.info(&quot;Twitter configuration file is missing&quot;);</span>
-<span class="nc" id="L48">        console.h1(heading);</span>
-<span class="nc" id="L49">        console.p(dataSourceMissing, description);</span>
-<span class="nc" id="L50">    }</span>
+<span class="nc" id="L48">        log.info(&quot;Twitter configuration file is missing&quot;);</span>
+<span class="nc" id="L49">        console.h1(heading);</span>
+<span class="nc" id="L50">        console.p(dataSourceMissing, description);</span>
+<span class="nc" id="L51">    }</span>
 
     public void viewTwitterAccountMissing(Set&lt;ConstraintViolation&lt;TwitterAccount&gt;&gt; violations) {
-<span class="nc" id="L53">        log.info(&quot;Twitter auth data is missing&quot;);</span>
-<span class="nc" id="L54">        console.h1(heading);</span>
-<span class="nc" id="L55">        console.p(authDataMissing);</span>
-<span class="nc" id="L56">        console.print(violations);</span>
-<span class="nc" id="L57">    }</span>
-    
-    
+<span class="nc" id="L54">        log.info(&quot;Twitter auth data is missing&quot;);</span>
+<span class="nc" id="L55">        console.h1(heading);</span>
+<span class="nc" id="L56">        console.p(authDataMissing);</span>
+<span class="nc" id="L57">        console.print(violations);</span>
+<span class="nc" id="L58">    }</span>
+
+
     /**
      * Print the tweets
-     * 
+     *
      * @param event This method uses {@link TweetRetrievalEvent#getTweetsFromTwitter() }
      * and prints the tweets using a {@link Logger}
      */
     protected void printTweets(
-            @Observes @Priority(TweetRetrievalPriority.PRINT_TWEETS_FROM_TWITTER) 
+            @Observes @Priority(TweetRetrievalPriority.PRINT_TWEETS_FROM_TWITTER)
             TweetRetrievalEvent event
     ){
-<span class="nc" id="L70">        List&lt;Status&gt; tweetsFromTwitter = event.getTweetsFromTwitter();</span>
-        
-<span class="nc bnc" id="L72" title="All 2 branches missed.">        for (Status s : tweetsFromTwitter) {</span>
-<span class="nc" id="L73">            log.info(&quot;======================================================================================&quot;);</span>
-                       
+<span class="nc" id="L71">        List&lt;Status&gt; tweetsFromTwitter = event.getTweetsFromTwitter();</span>
+
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        for (Status s : tweetsFromTwitter) {</span>
+<span class="nc" id="L74">            log.info(&quot;======================================================================================&quot;);</span>
+
             // is retweet?
-<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (s.isRetweet()) {</span>
-<span class="nc" id="L77">                String name = s.getUser().getName();</span>
-<span class="nc" id="L78">                log.info(String.format(&quot;%s retweeted\n&quot;, name));</span>
-<span class="nc" id="L79">                s = s.getRetweetedStatus();</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (s.isRetweet()) {</span>
+<span class="nc" id="L78">                String name = s.getUser().getName();</span>
+<span class="nc" id="L79">                log.info(String.format(&quot;%s retweeted\n&quot;, name));</span>
+<span class="nc" id="L80">                s = s.getRetweetedStatus();</span>
             }
-                      
+
             // Profile image
-<span class="nc" id="L83">            String profileImageUrl = s.getUser().getProfileImageURL();</span>
-<span class="nc" id="L84">            log.info(profileImageUrl);</span>
-            
+<span class="nc" id="L84">            String profileImageUrl = s.getUser().getProfileImageURL();</span>
+<span class="nc" id="L85">            log.info(String.format(&quot;profileImageUrl=\&quot;%s\&quot;&quot;,profileImageUrl));</span>
+
             // Name
-<span class="nc" id="L87">            String name = s.getUser().getName();            </span>
+<span class="nc" id="L88">            String name = s.getUser().getName();</span>
+<span class="nc" id="L89">            log.info(String.format(&quot;user name=\&quot;%s\&quot;&quot;,name));</span>
             // Screen name
-<span class="nc" id="L89">            String screenName = s.getUser().getScreenName();</span>
+<span class="nc" id="L91">            String screenName = s.getUser().getScreenName();</span>
+<span class="nc" id="L92">            log.info(String.format(&quot;user screenname=\&quot;%s\&quot;&quot;,screenName));</span>
             // Time since tweet
-<span class="nc" id="L91">            SimpleDateFormat sdf = new SimpleDateFormat(&quot;(EEE, dd MMM yyyy, hh:mm:ss a)&quot;);</span>
-<span class="nc" id="L92">            log.info(String.format(&quot;%s @%s  %s&quot;, name, screenName, sdf.format(s.getCreatedAt())));</span>
-                
+<span class="nc" id="L94">            SimpleDateFormat sdf = new SimpleDateFormat(&quot;(EEE, dd MMM yyyy, hh:mm:ss a)&quot;);</span>
+<span class="nc" id="L95">            log.info(String.format(&quot;created at = \&quot;%s\&quot;&quot;, sdf.format(s.getCreatedAt())));</span>
+
             // Text
-<span class="nc" id="L95">            String text = s.getText();</span>
-            {
-                // Hyperlinks
-<span class="nc" id="L98">                URLEntity[] urlEntities = s.getURLEntities();</span>
-<span class="nc bnc" id="L99" title="All 2 branches missed.">                if (urlEntities != null) {</span>
-<span class="nc bnc" id="L100" title="All 2 branches missed.">                    for (URLEntity urlEntity : urlEntities) {</span>
-<span class="nc" id="L101">                        text = text.replaceAll(urlEntity.getURL(), urlEntity.getExpandedURL());</span>
-                    }
-                }
-            }
-<span class="nc" id="L105">            log.info(text);</span>
-            
+<span class="nc" id="L98">            log.info(String.format(&quot;TEXT =%n%s&quot;,s.getText()));</span>
+
             // Hashtags
             // https://twitter.com/search?q=%23UnlimitedScreaming
-<span class="nc" id="L109">            HashtagEntity[] hashtagEntities = s.getHashtagEntities();</span>
-<span class="nc bnc" id="L110" title="All 2 branches missed.">            if (hashtagEntities != null) {</span>
-<span class="nc" id="L111">                log.info(&quot;[HASHTAGS]&quot;);</span>
-<span class="nc bnc" id="L112" title="All 2 branches missed.">                for (HashtagEntity entity : hashtagEntities) {</span>
-<span class="nc" id="L113">                    log.info(ToStringBuilder.reflectionToString(entity));</span>
+<span class="nc" id="L102">            HashtagEntity[] hashtagEntities = s.getHashtagEntities();</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if (hashtagEntities != null) {</span>
+<span class="nc" id="L104">                log.info(&quot;[HASHTAGS]&quot;);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">                for (HashtagEntity entity : hashtagEntities) {</span>
+<span class="nc" id="L106">                    log.info(ToStringBuilder.reflectionToString(entity));</span>
                 }
             }
-            
-            // User mentions
-<span class="nc" id="L118">            UserMentionEntity[] userMentionEntities = s.getUserMentionEntities();</span>
-<span class="nc bnc" id="L119" title="All 2 branches missed.">            if (userMentionEntities != null) {</span>
-<span class="nc" id="L120">                log.info(&quot;[USER MENTIONS]&quot;);</span>
-<span class="nc bnc" id="L121" title="All 2 branches missed.">                for (UserMentionEntity entity : userMentionEntities) {</span>
-<span class="nc" id="L122">                    log.info(ToStringBuilder.reflectionToString(entity));                   </span>
-                }
-            }
-            
-            // URL Entities
-<span class="nc" id="L127">            URLEntity[] urlEntities = s.getURLEntities();</span>
-<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (urlEntities != null) {</span>
-<span class="nc" id="L129">                log.info(&quot;[URL ENTITIES]&quot;);</span>
-<span class="nc bnc" id="L130" title="All 2 branches missed.">                for (URLEntity entity : urlEntities) {</span>
-<span class="nc" id="L131">                    log.info(ToStringBuilder.reflectionToString(entity));</span>
-                }
-        }
-            
 
-            
+            // User mentions
+<span class="nc" id="L111">            UserMentionEntity[] userMentionEntities = s.getUserMentionEntities();</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            if (userMentionEntities != null) {</span>
+<span class="nc" id="L113">                log.info(&quot;[USER MENTIONS]&quot;);</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                for (UserMentionEntity entity : userMentionEntities) {</span>
+<span class="nc" id="L115">                    log.info(ToStringBuilder.reflectionToString(entity));</span>
+                }
+            }
+
+            // URL Entities
+<span class="nc" id="L120">            URLEntity[] urlEntities = s.getURLEntities();</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            if (urlEntities != null) {</span>
+<span class="nc" id="L122">                log.info(&quot;[URL ENTITIES]&quot;);</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">                for (URLEntity entity : urlEntities) {</span>
+<span class="nc" id="L124">                    log.info(ToStringBuilder.reflectionToString(entity));</span>
+                }
+            }
+
+            // Media Entites
+<span class="nc" id="L129">            MediaEntity[] mediaEntities = s.getMediaEntities();</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if (mediaEntities != null) {</span>
+<span class="nc" id="L131">                log.info(&quot;[MEDIA ENTITIES]&quot;);</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">                for (MediaEntity entity : mediaEntities) {</span>
+<span class="nc" id="L133">                    log.info(ToStringBuilder.reflectionToString(entity));</span>
+                }
+            }
+
 <span class="nc" id="L137">            log.info(&quot;--------------------------------------------------------------------------------------&quot;);</span>
 <span class="nc" id="L138">            log.info(ToStringBuilder.reflectionToString(s));</span>
 
 <span class="nc" id="L140">            log.info(&quot;======================================================================================&quot;);</span>
 <span class="nc" id="L141">        }</span>
-        
+
 <span class="nc" id="L143">        console.p(new LocalizedString(&quot;See log file for tweet details&quot;));</span>
 <span class="nc" id="L144">    }</span>
 
