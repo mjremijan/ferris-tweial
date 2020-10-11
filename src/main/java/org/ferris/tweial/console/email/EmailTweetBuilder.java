@@ -68,10 +68,7 @@ public class EmailTweetBuilder {
             URLEntity[] urlEntities = s.getURLEntities();
             if (urlEntities != null) {
                 for (URLEntity entity : urlEntities) {
-                    log.info(String.format("URL: %s%n", entity.getURL()));
                     String expandedUrl = entity.getExpandedURL();
-                                        log.info(String.format("expandedURL: %s%n", expandedUrl));
-
                     if (s.getQuotedStatus() != null && expandedUrl.contains(String.format("%d",s.getQuotedStatus().getId()))) {
                         statusText.decorate(
                               entity.getStart(), entity.getEnd() - 1
