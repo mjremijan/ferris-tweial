@@ -120,4 +120,37 @@ public class PatternForYouTubeTest {
             , expected.getMessage()
         );
     }
+
+    @Test
+    public void test_shortened_url_ok() {
+        // Arrange
+        PatternForYouTube p;
+
+        // Act
+        p = new PatternForYouTube("https://youtu.be/O4HbKE50OBU");
+
+        // Assert
+        Assert.assertTrue(p.matches());
+        Assert.assertEquals("O4HbKE50OBU", p.getVidId());
+    }
+
+    @Test
+    public void test_shorted_url_throws_exception_without_value() {
+        // Arrange
+        RuntimeException expected = null;
+
+        // Act
+        try {
+            new PatternForYouTube("https://youtu.be/");
+        } catch (RuntimeException e) {
+            expected = e;
+        }
+
+        // Assert
+        Assert.assertNotNull(expected);
+        Assert.assertEquals(
+            "Unable to find YouTube video ID in \"https://youtu.be/\""
+            , expected.getMessage()
+        );
+    }
 }
