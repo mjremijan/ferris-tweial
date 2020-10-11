@@ -328,7 +328,7 @@ public class EmailRendererByFreeMarkerTest {
 
         // Assert
         Assert.assertEquals(
-              "Tweet begin url:<a href=\"http://junit.org/m/resource/ywehry\">http://junit.org/m/resource/ywehry</a> <a href=\"https://twitter.com/search?f=tweets&vertical=default&q=%23amazon\">#amazon</a>  ipsum lorem  <a href=\"https://twitter.com/search?f=tweets&vertical=default&q=%23oracle\">#oracle</a> <a href=\"https://twitter.com/rred\">@rred</a> x  y  end"
+              "Tweet begin url:<a href=\"http://junit.org/m/resource/ywehry\">http://junit.org/m/resource/ywehry</a> <a href=\"https://twitter.com/search?f=tweets&vertical=default&q=%23amazon\">#amazon</a>  ipsum lorem  <a href=\"https://twitter.com/search?f=tweets&vertical=default&q=%23oracle\">#oracle</a> <a href=\"https://twitter.com/rred\">@rred</a> x  y <a href=\"https://www.youtube.com/watch?v=RaSmassvv4w\">https://www.youtube.com/watch?v=RaSmassvv4w</a> end"
             , message.trim()
         );
     }

@@ -78,16 +78,11 @@ public class EmailTweetBuilder {
                         PatternForYouTube p = new PatternForYouTube(expandedUrl);
                         if (p.matches()) {
                             t.youTubeVideos.add(p.getVidId());
-                            statusText.decorate(
-                                    entity.getStart(), entity.getEnd() - 1
-                                , (m) -> ""
-                            );
-                        } else {
-                            statusText.decorate(
-                                  entity.getStart(), entity.getEnd() - 1
-                                , (m) -> String.format("<a href=\"%1$s\">%1$s</a>", expandedUrl)
-                            );
                         }
+                        statusText.decorate(
+                              entity.getStart(), entity.getEnd() - 1
+                            , (m) -> String.format("<a href=\"%1$s\">%1$s</a>", expandedUrl)
+                        );
                     }
                 }
             }
@@ -153,15 +148,17 @@ public class EmailTweetBuilder {
                             Arrays.stream(entity.getVideoVariants())
                                 .filter(v -> v.getContentType().contains("mp4"))
                                 .max(Comparator.comparing(Variant::getBitrate))
-                                .ifPresent( v ->
-                                    t.videoMedia.add(
-                                        new EmailVideo.Builder()
-                                            .poster(entity.getMediaURLHttps())
-                                            .src(v.getUrl())
-                                            .type(v.getContentType())
-                                            .millis(entity.getVideoDurationMillis())
-                                            .build()
-                                    )
+                                .ifPresent( v -> {
+                                        urlsToRemoveFromTweetText.add(entity.getURL());
+                                        t.videoMedia.add(
+                                            new EmailVideo.Builder()
+                                                .poster(entity.getMediaURLHttps())
+                                                .src(v.getUrl())
+                                                .type(v.getContentType())
+                                                .millis(entity.getVideoDurationMillis())
+                                                .build()
+                                        );
+                                    }
                                 )
                             ;
                         }
